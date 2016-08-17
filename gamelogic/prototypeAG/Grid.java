@@ -15,10 +15,6 @@ class Grid {
         this.random = new Random();
     }
     
-    void setGrid(int x, int y) {
-        this.gameObjects = new GameObject[y][x];
-    }
-    
     int getX() {
         return this.gameObjects[0].length;
     }
