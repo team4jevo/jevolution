@@ -361,6 +361,7 @@ class Grid {
         grid.update();
         System.out.println("----------------- Post update 2 -------------------");
         grid.printGrid();
+        System.out.println("----------------- Post update 3 --------------------");
     }
 
 }
