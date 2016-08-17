@@ -1,4 +1,4 @@
-package jevolution;
+package gamelogic;
 
 
 import java.util.*;
@@ -347,7 +347,7 @@ class Grid {
             grid.addObject(new Creature());
         }
         */
-        /*
+        
         grid.addObject(new Creature(), 1, 1);
         grid.addObject(new Creature(), 1, 2);
         grid.addObject(new Creature(), 2, 1);
@@ -356,12 +356,7 @@ class Grid {
         grid.addObject(new Creature(), 3, 4);
         grid.addObject(new Creature(), 4, 3);
         grid.addObject(new Creature(), 4, 4);
-        */
-        grid.addObject(new Creature(), 0, 1);
-        grid.addObject(new Creature(), 1, 0);
-        grid.addObject(new Creature(), 1, 1);
-        grid.addObject(new Creature(), 1, 2);
-        grid.addObject(new Creature(), 2, 1);
+        
         System.out.println("----------------- Initial state -------------------");
         grid.printGrid();
         grid.update();

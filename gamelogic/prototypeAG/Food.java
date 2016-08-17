@@ -1,4 +1,4 @@
-package jevolution;
+package gamelogic;
 
 import java.awt.Point;
 
