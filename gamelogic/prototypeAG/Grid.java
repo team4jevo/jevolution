@@ -126,6 +126,7 @@ public class Grid {
                 this.gameObjects[y][x] = null;
             }
         }
+        this.aliveCreatures.clear();
     }
 
     private boolean isFull() {
@@ -187,7 +188,7 @@ public class Grid {
      * Method returns 2D array containing game objects.
      */
     public GameObject[][] getGameObjects() {
-    	return this.gameObjects;
+        return this.gameObjects;
     }
     
     /**

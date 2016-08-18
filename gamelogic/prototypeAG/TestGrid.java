@@ -51,7 +51,7 @@ class TestGrid {
         System.out.println("------------------------------------------------------------------");
         grid.printGrid();
         for (int i = 0; i < 100; i++) {
-        	grid.update();
+            grid.update();
         }
         System.out.println("-------------------------- After 100 steps -----------------------");
         TestGrid.printAliveCreatures(aliveCreatures);
