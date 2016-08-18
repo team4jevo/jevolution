@@ -2,7 +2,7 @@ package gamelogic;
 
 import java.util.*;
 
-class Grid {
+public class Grid {
     private GameObject[][] gameObjects;
     private Random random;
     private boolean[][] nextState;
@@ -15,11 +15,11 @@ class Grid {
         this.aliveCreatures = new HashMap<>();
     }
 
-    int getX() {
+    public int getX() {
         return this.gameObjects[0].length;
     }
 
-    int getY() {
+    public int getY() {
         return this.gameObjects.length;
     }
 
@@ -56,7 +56,7 @@ class Grid {
      *            -> y coordinate (array index)
      * @throws Exception
      */
-    void addObject(GameObject object, int x, int y) throws Exception {
+    public void addObject(GameObject object, int x, int y) throws Exception {
         // If x or y is out of range, throw exception
         if (x < 0 || x >= this.getX() || y < 0 || y >= this.getY()) {
             throw new Exception("Array index out of bounds!");
@@ -143,7 +143,7 @@ class Grid {
      * Method updates status of each creature according to rules of Game of Life
      * (currently).
      */
-    void update() {
+    public void update() {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
                 if (this.gameObjects[y][x] != null) {
@@ -183,7 +183,19 @@ class Grid {
         this.setNextState();
     }
     
-    HashMap<String, Integer> getNumberOfAliveCreatures() {
+    /**
+     * Method returns 2D array containing game objects.
+     */
+    public GameObject[][] getGameObjects() {
+    	return this.gameObjects;
+    }
+    
+    /**
+     * Method returns HashMap with key that represents type of creature and
+     * value that represents number of alive creatures.
+     * @return
+     */
+    public HashMap<String, Integer> getNumberOfAliveCreatures() {
         return this.aliveCreatures;
     }
 

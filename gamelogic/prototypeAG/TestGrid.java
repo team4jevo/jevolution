@@ -46,20 +46,16 @@ class TestGrid {
             }
         }
         HashMap<String, Integer> aliveCreatures = grid.getNumberOfAliveCreatures();
-        System.out.println("--------------- Initial state --------------");
+        System.out.println("-------------------------- Initial state -------------------------");
         TestGrid.printAliveCreatures(aliveCreatures);
+        System.out.println("------------------------------------------------------------------");
         grid.printGrid();
-        grid.update();
-        System.out.println("--------------- Post update 1 --------------");
+        for (int i = 0; i < 100; i++) {
+        	grid.update();
+        }
+        System.out.println("-------------------------- After 100 steps -----------------------");
         TestGrid.printAliveCreatures(aliveCreatures);
-        grid.printGrid();
-        grid.update();
-        System.out.println("--------------- Post update 2 --------------");
-        TestGrid.printAliveCreatures(aliveCreatures);
-        grid.printGrid();
-        grid.update();
-        System.out.println("--------------- Post update 3 --------------");
-        TestGrid.printAliveCreatures(aliveCreatures);
+        System.out.println("------------------------------------------------------------------");
         grid.printGrid();
     }
 

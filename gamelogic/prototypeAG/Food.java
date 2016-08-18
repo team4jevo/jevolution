@@ -6,17 +6,17 @@ import java.awt.Point;
 class Food extends GameObject {
 
     @Override
-    void setLocation (int x, int y) {
+    public void setLocation (int x, int y) {
         this.location = new Point(x, y);
     }
     
     @Override
-    Point getLocation() {
+    public Point getLocation() {
         return this.location;
     }
     
     @Override
-    String getType() {
+    public String getType() {
         return this.getClass().getSimpleName();
     }
 

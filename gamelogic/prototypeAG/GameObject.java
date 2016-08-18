@@ -10,9 +10,9 @@ import java.awt.Point;
  *
  */
 
-abstract class GameObject {
+public abstract class GameObject {
     protected Point location;
-    abstract void setLocation(int x, int y);
-    abstract Point getLocation();
-    abstract String getType();
+    public abstract void setLocation(int x, int y);
+    public abstract Point getLocation();
+    public abstract String getType();
 }

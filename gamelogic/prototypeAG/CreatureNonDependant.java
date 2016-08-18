@@ -6,7 +6,7 @@ package gamelogic;
  * @author aigars
  *
  */
-class CreatureNonDependant extends Creature implements SurvivalInstinct {
+public class CreatureNonDependant extends Creature implements SurvivalInstinct {
 
     @Override
     public boolean survives(int nNeighbors) {

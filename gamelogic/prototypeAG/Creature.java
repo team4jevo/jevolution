@@ -11,26 +11,26 @@ class Creature extends GameObject {
         this.isAlive = true;
     }
     
-    void setStatus(boolean status) {
+    public void setStatus(boolean status) {
         this.isAlive = status;
     }
     
-    boolean getStatus() {
+    public boolean getStatus() {
         return this.isAlive;
     }
     
     @Override
-    void setLocation (int x, int y) {
+    public void setLocation (int x, int y) {
         this.location = new Point(x, y);
     }
     
     @Override
-    Point getLocation() {
+    public Point getLocation() {
         return this.location;
     }
     
     @Override
-    String getType() {
+    public String getType() {
         return this.getClass().getSimpleName();
     }
     
