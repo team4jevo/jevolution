@@ -1,31 +1,32 @@
 package gamelogic;
 
-
 import java.util.*;
-
 
 class Grid {
     private GameObject[][] gameObjects;
     private Random random;
     private boolean[][] nextState;
-    
+    private HashMap<String, Integer> aliveCreatures;
+
     Grid(int x, int y) {
         this.gameObjects = new GameObject[y][x];
         this.nextState = new boolean[y][x];
         this.random = new Random();
+        this.aliveCreatures = new HashMap<>();
     }
-    
+
     int getX() {
         return this.gameObjects[0].length;
     }
-    
+
     int getY() {
         return this.gameObjects.length;
     }
-    
+
     /**
      * Methods adds new object in random place into array of objects. In case
      * array is full, throws Exception.
+     * 
      * @param object
      */
     void addObject(GameObject object) throws Exception {
@@ -42,24 +43,39 @@ class Grid {
             throw new Exception("Cannot add more elements. Array is full.");
         }
     }
-    
+
     /**
-     * Method tries to add instance of GameObject at specified position. If cell is taken,
-     * throws Exception.
-     * @param object -> object to be added
-     * @param x -> x coordinate (array index)
-     * @param y -> y coordinate (array index)
+     * Method tries to add instance of GameObject at specified position. If cell
+     * is taken, throws Exception.
+     * 
+     * @param object
+     *            -> object to be added
+     * @param x
+     *            -> x coordinate (array index)
+     * @param y
+     *            -> y coordinate (array index)
      * @throws Exception
      */
     void addObject(GameObject object, int x, int y) throws Exception {
         // If x or y is out of range, throw exception
-        if (x < 0 || x >= this.getX() ||
-            y < 0 || y >= this.getY()) {
+        if (x < 0 || x >= this.getX() || y < 0 || y >= this.getY()) {
             throw new Exception("Array index out of bounds!");
         }
         if (!this.isFull()) {
             if (this.gameObjects[y][x] != null) {
-                throw new Exception("Cannot add element in x=" + x + ", y=" + y + ". Cell taken.");
+                throw new Exception("Cannot add element in x=" + x + ", y=" + y
+                        + ". Cell taken.");
+            }
+            if (!object.getType().equals("Food")) {
+                Creature creature = (Creature) object;
+                if (creature.getStatus()) {
+                    if (aliveCreatures.containsKey(creature.getType())) {
+                        aliveCreatures.put(creature.getType(),
+                                aliveCreatures.get(creature.getType()) + 1);
+                    } else {
+                        aliveCreatures.put(creature.getType(), 1);
+                    }
+                }
             }
             object.setLocation(x, y);
             this.gameObjects[y][x] = object;
@@ -67,10 +83,11 @@ class Grid {
             throw new Exception("Cannot add more elements. Array is full.");
         }
     }
-    
+
     /**
-     * Prints grid in terminal. Food is represented by string "F", alive creature is
-     * represented by string "A", dead creature is represented by string "D".
+     * Prints grid in terminal. Food is represented by string "F", alive
+     * creature is represented by string "A", dead creature is represented by
+     * string "D".
      */
     void printGrid() {
         for (int y = 0; y < this.getY(); y++) {
@@ -78,21 +95,28 @@ class Grid {
                 GameObject currObject = gameObjects[y][x];
                 if (currObject == null) {
                     System.out.print(" ");
-                } else if (currObject.getType().equals("Creature")) {
+                } else if (!currObject.getType().equals("Food")) {
                     Creature creature = (Creature) currObject;
                     if (creature.getStatus()) {
-                        System.out.print("A");
+                        if (creature.getType().equals("CreatureSimple")) {
+                            System.out.print("A");
+                        } else if (creature.getType().equals(
+                                "CreatureDependant")) {
+                            System.out.print("B");
+                        } else {
+                            System.out.print("C");
+                        }
                     } else {
-                        System.out.print("D");
+                        System.out.print(" ");
                     }
                 } else {
                     System.out.print("F");
-                }    
+                }
             }
             System.out.println();
         }
     }
-    
+
     /**
      * Method sets all elements in 2D array (gameObjects) to null.
      */
@@ -103,7 +127,7 @@ class Grid {
             }
         }
     }
-    
+
     private boolean isFull() {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
@@ -114,27 +138,42 @@ class Grid {
         }
         return true;
     }
-    
+
     /**
-     * Method updates status of each creature according to rules of
-     * Game of Life (currently).
+     * Method updates status of each creature according to rules of Game of Life
+     * (currently).
      */
     void update() {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
                 if (this.gameObjects[y][x] != null) {
                     GameObject currObject = this.gameObjects[y][x];
-                    if (currObject.getType().equals("Creature")) {
-                        Creature creature = (Creature) currObject;
-                        boolean creatureStatus = creature.getStatus();
+                    if (!currObject.getType().equals("Food")) {
+                        Creature cr = (Creature) currObject;
+                        boolean statusAfter = false;
+                        boolean statusBefore = cr.getStatus();
                         int neighborCount = this.getLivingNeighbors(x, y);
-                        boolean statusAfter =  false;
-                        // If less than 2 living neighbors
-                        if (creatureStatus && (neighborCount == 2 || neighborCount == 3)) {
-                            statusAfter = true;
+                        if (currObject.getType().equals("CreatureSimple")) {
+                            CreatureSimple creature = (CreatureSimple) currObject;
+                            statusAfter = creature.survives(neighborCount);
+                        } else if (currObject.getType().equals(
+                                "CreatureDependant")) {
+                            CreatureDependant creature = (CreatureDependant) currObject;
+                            statusAfter = creature.survives(neighborCount);
+                        } else if (currObject.getType().equals(
+                                "CreatureNonDependant")) {
+                            CreatureNonDependant creature = (CreatureNonDependant) currObject;
+                            statusAfter = creature.survives(neighborCount);
                         }
-                        if (neighborCount == 3) {
-                            statusAfter = true;
+                        // Update number of alive creatures
+                        if (statusBefore) {
+                            if (!statusAfter) {
+                                aliveCreatures.put(cr.getType(), aliveCreatures.get(cr.getType()) - 1);
+                            }
+                        } else {
+                            if (statusAfter) {
+                                aliveCreatures.put(cr.getType(), aliveCreatures.get(cr.getType()) + 1);
+                            }
                         }
                         this.nextState[y][x] = statusAfter;
                     }
@@ -144,8 +183,14 @@ class Grid {
         this.setNextState();
     }
     
+    HashMap<String, Integer> getNumberOfAliveCreatures() {
+        return this.aliveCreatures;
+    }
+
     /**
-     * Method returns number of living creatures
+     * Method returns number of living creatures nearby around certain location
+     * (x, y)
+     * 
      * @param x
      * @param y
      * @return
@@ -155,7 +200,7 @@ class Grid {
         // Check right side
         if (x != this.getX() - 1 && this.gameObjects[y][x + 1] != null) {
             GameObject currObject = this.gameObjects[y][x + 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -163,9 +208,10 @@ class Grid {
             }
         }
         // Check cells on bottom right
-        if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
+        if (x != this.getX() - 1 && y != this.getY() - 1
+                && this.gameObjects[y + 1][x + 1] != null) {
             GameObject currObject = this.gameObjects[y + 1][x + 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -175,7 +221,7 @@ class Grid {
         // Check cells on bottom
         if (y != this.getY() - 1 && this.gameObjects[y + 1][x] != null) {
             GameObject currObject = this.gameObjects[y + 1][x];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -183,9 +229,10 @@ class Grid {
             }
         }
         // Check cells on left bottom corner
-        if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
+        if (x > 0 && y != this.getY() - 1
+                && this.gameObjects[y + 1][x - 1] != null) {
             GameObject currObject = this.gameObjects[y + 1][x - 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -195,7 +242,7 @@ class Grid {
         // Check left side
         if (x > 0 && this.gameObjects[y][x - 1] != null) {
             GameObject currObject = this.gameObjects[y][x - 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -205,7 +252,7 @@ class Grid {
         // Check top
         if (y > 0 && this.gameObjects[y - 1][x] != null) {
             GameObject currObject = this.gameObjects[y - 1][x];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -215,7 +262,7 @@ class Grid {
         // Check top left corner
         if (x > 0 && y > 0 && this.gameObjects[y - 1][x - 1] != null) {
             GameObject currObject = this.gameObjects[y - 1][x - 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -223,9 +270,10 @@ class Grid {
             }
         }
         // Check top right corner
-        if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
+        if (x < this.getX() - 1 && y > 0
+                && this.gameObjects[y - 1][x + 1] != null) {
             GameObject currObject = this.gameObjects[y - 1][x + 1];
-            if (currObject.getType().equals("Creature")) {
+            if (!currObject.getType().equals("Food")) {
                 Creature creature = (Creature) currObject;
                 if (creature.getStatus()) {
                     count++;
@@ -234,7 +282,7 @@ class Grid {
         }
         return count;
     }
-    
+
     /**
      * Method returns ArrayList of Food objects that neighbor certain cell.
      */
@@ -249,7 +297,8 @@ class Grid {
             }
         }
         // Check cells on bottom right
-        if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
+        if (x != this.getX() - 1 && y != this.getY() - 1
+                && this.gameObjects[y + 1][x + 1] != null) {
             GameObject currObject = this.gameObjects[y + 1][x + 1];
             if (currObject.getType().equals("Food")) {
                 Food food = (Food) currObject;
@@ -265,7 +314,8 @@ class Grid {
             }
         }
         // Check cells on left bottom corner
-        if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
+        if (x > 0 && y != this.getY() - 1
+                && this.gameObjects[y + 1][x - 1] != null) {
             GameObject currObject = this.gameObjects[y + 1][x - 1];
             if (currObject.getType().equals("Food")) {
                 Food food = (Food) currObject;
@@ -297,7 +347,8 @@ class Grid {
             }
         }
         // Check top right corner
-        if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
+        if (x < this.getX() - 1 && y > 0
+                && this.gameObjects[y - 1][x + 1] != null) {
             GameObject currObject = this.gameObjects[y - 1][x + 1];
             if (currObject.getType().equals("Food")) {
                 Food food = (Food) currObject;
@@ -306,18 +357,18 @@ class Grid {
         }
         return result;
     }
-    
-    
+
     /**
-     * Method sets the next state for creatures, determined by the current state.
-     * After executed, resets all elements in (nextState) 2D array to false.
+     * Method sets the next state for creatures, determined by the current
+     * state. After executed, resets all elements in (nextState) 2D array to
+     * false.
      */
     private void setNextState() {
         for (int y = 0; y < this.nextState.length; y++) {
             for (int x = 0; x < this.nextState[0].length; x++) {
                 if (this.gameObjects[y][x] != null) {
                     GameObject currObject = this.gameObjects[y][x];
-                    if (currObject.getType().equals("Creature")) {
+                    if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         creature.setStatus(this.nextState[y][x]);
                         this.gameObjects[y][x] = creature;
@@ -331,7 +382,7 @@ class Grid {
             }
         }
     }
-    
+
     /**
      * @param args
      */
@@ -339,11 +390,9 @@ class Grid {
         int x = 5, y = 5;
         Grid grid = new Grid(x, y);
         /*
-        for (int i = 0; i < 16; i++) {
-            grid.addObject(new Creature());
-        }
-        */
-        
+         * for (int i = 0; i < 16; i++) { grid.addObject(new Creature()); }
+         */
+
         grid.addObject(new Creature(), 1, 1);
         grid.addObject(new Creature(), 1, 2);
         grid.addObject(new Creature(), 2, 1);
@@ -352,16 +401,19 @@ class Grid {
         grid.addObject(new Creature(), 3, 4);
         grid.addObject(new Creature(), 4, 3);
         grid.addObject(new Creature(), 4, 4);
-        
-        System.out.println("----------------- Initial state -------------------");
+
+        System.out
+                .println("----------------- Initial state -------------------");
         grid.printGrid();
         grid.update();
         System.out.println("----------------- Post update -------------------");
         grid.printGrid();
         grid.update();
-        System.out.println("----------------- Post update 2 -------------------");
+        System.out
+                .println("----------------- Post update 2 -------------------");
         grid.printGrid();
-        System.out.println("----------------- Post update 3 --------------------");
+        System.out
+                .println("----------------- Post update 3 --------------------");
     }
 
 }
