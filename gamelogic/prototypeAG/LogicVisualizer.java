@@ -6,7 +6,7 @@ import edu.princeton.cs.algs4.StdDraw;
 
 public class LogicVisualizer {
     // Delay in seconds
-    private static final int DELAY = 25;
+    private static final int DELAY = 100;
 
     public static void draw(GameLogic gameLogic) {
         StdDraw.clear();
@@ -47,20 +47,23 @@ public class LogicVisualizer {
     }
 
     public static void main(String[] args) throws Exception {
-        Grid grid = new Grid(100, 100);
+        Grid grid = new Grid(50, 50);
         GameLogic gameLogic = new GameLogic(grid);
-        gameLogic.initializeGrid("classic");
+        gameLogic.initializeGrid("mix1");
+        gameLogic.setLocality(3);
         // Turn on animation mode
         StdDraw.enableDoubleBuffering();
         LogicVisualizer.draw(gameLogic);
         StdDraw.show();
         StdDraw.pause(LogicVisualizer.DELAY);
+        
         for (int i = 0; i < 5000; i++) {
             gameLogic.nextTurn();
             LogicVisualizer.draw(gameLogic);
             StdDraw.show();
             StdDraw.pause(LogicVisualizer.DELAY);
         }
+        
         /*
         int greenCount = 0;
         int blueCount = 0;

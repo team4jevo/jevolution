@@ -12,8 +12,8 @@ public class CreatureDependant extends Creature implements SurvivalInstinct {
     public boolean survives(int nNeighbors) {
         boolean state = false;
         if (this.getStatus()) {
-         // Creature favors more alive neighbors around but dies if they are below 2
-            if (nNeighbors == 2 || nNeighbors == 3 || nNeighbors == 4) {
+         // Creature favors more alive neighbors around but dies if they are below 3
+            if (nNeighbors == 3 || nNeighbors == 4) {
                 state = true;
             }
         } else {
@@ -23,14 +23,6 @@ public class CreatureDependant extends Creature implements SurvivalInstinct {
             }
         }
         return state;
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
     }
 
 }

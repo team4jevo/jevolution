@@ -1,18 +1,36 @@
 package gamelogic;
 
+import java.awt.Point;
 import java.util.*;
 
 public class Grid {
 	private GameObject[][] gameObjects;
-	private Random random;
 	private boolean[][] nextState;
+	private Random random;
 	private HashMap<String, Integer> aliveCreatures;
+	private int locality;
 
-	Grid(int x, int y) {
+	/**
+	 * Grid constructor.
+	 * 
+	 * @param x
+	 *            length of 2d array representing x axis. Value must be in range
+	 *            [5, 100]
+	 * @param y
+	 *            length of 2d array representing y axis. Value must be in range
+	 *            [5, 100]
+	 * @throws Exception
+	 *             Throws exception if invalid values have been provided
+	 */
+	Grid(int x, int y) throws Exception {
+		if (x < 5 || x > 100 || y < 5 || y > 100) {
+			throw new Exception("Invalid parameters to Grid constructor provided. x and y must be in range [5, 100].");
+		}
 		this.gameObjects = new GameObject[y][x];
 		this.nextState = new boolean[y][x];
 		this.random = new Random();
 		this.aliveCreatures = new HashMap<>();
+		this.locality = 0;
 	}
 
 	public int getX() {
@@ -28,6 +46,7 @@ public class Grid {
 	 * array is full, throws Exception.
 	 * 
 	 * @param object
+	 *            game object to be added in 2d array containing game objects
 	 */
 	void addObject(GameObject object) throws Exception {
 		if (!this.isFull()) {
@@ -49,12 +68,18 @@ public class Grid {
 	 * is taken, throws Exception.
 	 * 
 	 * @param object
-	 *            -> object to be added
+	 *            game object to be added in 2d array containing game objects
 	 * @param x
-	 *            -> x coordinate (array index)
+	 *            x coordinate of the object. Corresponds to index [..][x] in 2d
+	 *            array of game objects. Provided value must be in range [0,
+	 *            gameObjects[0].length - 1]
 	 * @param y
-	 *            -> y coordinate (array index)
+	 *            y coordinate of the object. Corresponds to index [y][..] in 2d
+	 *            array of game objects. Provided value must be in range [0,
+	 *            gameObjects.length - 1]
 	 * @throws Exception
+	 *             throws exception if invalid x and y values are provided, cell
+	 *             is already taken or 2d array containing game objects is full
 	 */
 	public void addObject(GameObject object, int x, int y) throws Exception {
 		// If x or y is out of range, throw exception
@@ -84,8 +109,9 @@ public class Grid {
 
 	/**
 	 * Prints grid in terminal. Food is represented by string "F", alive
-	 * creature is represented by string "A", dead creature is represented by
-	 * string "D".
+	 * SimpleCreature instance is represented by string "A", CreatureDependant
+	 * instance is represented by string "B", CreatureNonDependant is
+	 * represented by string "C" and dead creature is represented by string "D".
 	 */
 	void printGrid() {
 		for (int y = 0; y < this.getY(); y++) {
@@ -115,7 +141,8 @@ public class Grid {
 	}
 
 	/**
-	 * Method sets all elements in 2D array (gameObjects) to null.
+	 * Method sets all elements in 2D array (gameObjects) to null and clears map
+	 * containing creature types and number of alive creatures per type
 	 */
 	void reset() {
 		for (int y = 0; y < this.getY(); y++) {
@@ -126,6 +153,11 @@ public class Grid {
 		this.aliveCreatures.clear();
 	}
 
+	/**
+	 * Method checks if 2d array containing game objects is full
+	 * 
+	 * @return true if 2d array containing game objects is full, false otherwise
+	 */
 	private boolean isFull() {
 		for (int y = 0; y < this.getY(); y++) {
 			for (int x = 0; x < this.getX(); x++) {
@@ -138,8 +170,8 @@ public class Grid {
 	}
 
 	/**
-	 * Method updates status of each creature according to rules of Game of Life
-	 * (currently).
+	 * Method updates status of each creature according to rules that govern
+	 * whether creature in cell survives or not
 	 */
 	public void update() {
 		for (int y = 0; y < this.getY(); y++) {
@@ -150,7 +182,7 @@ public class Grid {
 						Creature cr = (Creature) currObject;
 						boolean statusAfter = false;
 						boolean statusBefore = cr.getStatus();
-						int neighborCount = this.getLivingNeighbors(x, y);
+						int neighborCount = this.getLivingNeighbors(x, y, this.locality);
 						if (currObject.getType().equals("CreatureSimple")) {
 							CreatureSimple creature = (CreatureSimple) currObject;
 							statusAfter = creature.survives(neighborCount);
@@ -180,224 +212,251 @@ public class Grid {
 	}
 
 	/**
-	 * Method returns 2D array containing game objects.
+	 * Method returns 2D array containing game objects
+	 * 
+	 * @return 2d array with game objects
 	 */
 	public GameObject[][] getGameObjects() {
 		return this.gameObjects;
 	}
 
 	/**
-	 * Method returns HashMap with key that represents type of creature and
-	 * value that represents number of alive creatures.
+	 * Method returns map with key as string that represents type of creature
+	 * and value as integer that represents number of alive creatures per
+	 * creature type.
 	 * 
-	 * @return
+	 * @return map with creature type and number of alive creatures per creature
+	 *         type
 	 */
 	public HashMap<String, Integer> getNumberOfAliveCreatures() {
 		return this.aliveCreatures;
 	}
 
 	/**
-	 * Method returns number of living creatures nearby around certain location
-	 * (x, y)
+	 * Method returns number of living creatures located in both local and
+	 * non-local cells relative to cell with coordinates (x, y)
 	 * 
 	 * @param x
+	 *            x coordinate of cell relative to which local and non-local
+	 *            cells are checked
 	 * @param y
-	 * @return
-	 */
-	private int getLivingNeighbors(int x, int y) {
-		int count = 0;
-		// Check right side
-		if (x != this.getX() - 1 && this.gameObjects[y][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y][x + 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check cells on bottom right
-		if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x + 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check cells on bottom
-		if (y != this.getY() - 1 && this.gameObjects[y + 1][x] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check cells on left bottom corner
-		if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x - 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check left side
-		if (x > 0 && this.gameObjects[y][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y][x - 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check top
-		if (y > 0 && this.gameObjects[y - 1][x] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check top left corner
-		if (x > 0 && y > 0 && this.gameObjects[y - 1][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x - 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		// Check top right corner
-		if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x + 1];
-			if (!currObject.getType().equals("Food")) {
-				Creature creature = (Creature) currObject;
-				if (creature.getStatus()) {
-					count++;
-				}
-			}
-		}
-		return count;
-	}
-
-	/**
-	 * Method returns number of living neighbors both local and non-local.
-	 * 
-	 * @param x
-	 * @param y
+	 *            y coordinate of cell relative to which local and non-local
+	 *            cells are checked
 	 * @param locality
-	 *            in range of [0, 8]. 0 checks for fully local neighbors, 8
-	 *            checks for fully non-local neighbors
-	 * @return
+	 *            Determines how many unique local and non-local cells should be
+	 *            checked for living creatures. Value provided must be in range
+	 *            [0, 8]. 0 checks only local cells, 8 checks only non-local
+	 *            cells. 4 checks 4 random local cells and 4 random non-local
+	 *            cells.
+	 * @return number of living creatures in local and non-local cells checked
 	 */
 	private int getLivingNeighbors(int x, int y, int locality) {
+		// List that contains local directions that should should be checked
+		ArrayList<Integer> directions = new ArrayList<>();
 		assert (locality >= 0 && locality <= 8) : "Invalid input. Paramater (locality) should be in range [0, 8].";
 		int count = 0;
-		// TODO Finish this method
-		switch (locality) {
-		case 0:
-			count = getLivingNeighbors(x, y);
-			break;
-		case 1:
-			
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		case 7:
-			break;
-		case 8:
-			break;
+		// Randomly determine local unique cells which should be checked
+		while (directions.size() < 8 - locality) {
+			int randomDirection = random.nextInt(8);
+			if (!directions.contains(randomDirection)) {
+				directions.add(randomDirection);
+			}
+		}
+		// Determine number of local living neighbors
+		count += neighborsInDirections(x, y, directions);
+		// Determine number of non-local living neighbors
+		count += nonLocalNeighbors(x, y, locality);
+		return count;
+	}
+
+	/**
+	 * Method returns number of living creatures located in some or all local
+	 * cells around a cell with coordinates (x, y)
+	 * 
+	 * @param x
+	 *            x coordinate of cell relative to which local cells are checked
+	 * @param y
+	 *            y coordinate of cell relative to which local cells are checked
+	 * @param directions
+	 *            list containing directions that determine which local cells
+	 *            relative to the cell should be checked
+	 * @return number of living creatures
+	 */
+	private int neighborsInDirections(int x, int y, ArrayList<Integer> directions) {
+		int count = 0;
+		for (int i = 0; i < directions.size(); i++) {
+			int currentDirection = directions.get(i);
+			switch (currentDirection) {
+			case 0:
+				// Check right side
+				if (x != this.getX() - 1 && this.gameObjects[y][x + 1] != null) {
+					GameObject currObject = this.gameObjects[y][x + 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 1:
+				// Check top right corner
+				if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
+					GameObject currObject = this.gameObjects[y - 1][x + 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 2:
+				// Check top
+				if (y > 0 && this.gameObjects[y - 1][x] != null) {
+					GameObject currObject = this.gameObjects[y - 1][x];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 3:
+				// Check top left corner
+				if (x > 0 && y > 0 && this.gameObjects[y - 1][x - 1] != null) {
+					GameObject currObject = this.gameObjects[y - 1][x - 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 4:
+				// Check left side
+				if (x > 0 && this.gameObjects[y][x - 1] != null) {
+					GameObject currObject = this.gameObjects[y][x - 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 5:
+				// Check cells on left bottom corner
+				if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
+					GameObject currObject = this.gameObjects[y + 1][x - 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 6:
+				// Check cells on bottom
+				if (y != this.getY() - 1 && this.gameObjects[y + 1][x] != null) {
+					GameObject currObject = this.gameObjects[y + 1][x];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			case 7:
+				// Check cells on bottom right
+				if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
+					GameObject currObject = this.gameObjects[y + 1][x + 1];
+					if (!currObject.getType().equals("Food")) {
+						Creature creature = (Creature) currObject;
+						if (creature.getStatus()) {
+							count++;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
 		}
 		return count;
 	}
 
 	/**
-	 * Method returns ArrayList of Food objects that neighbor certain cell.
+	 * Method randomly checks (n) unique cells in the grid and returns number of
+	 * cells that contain living creature relative to cell with coordinates (x,
+	 * y)
+	 * 
+	 * @param x
+	 *            x coordinate of cell relative to which random non-local
+	 *            neighbors are checked
+	 * @param y
+	 *            y coordinate of cell relative to which random non-local
+	 *            neighbors are checked
+	 * @param n
+	 *            number of random cells that should be checked
+	 * @return number of living creatures in checked cells
 	 */
-	ArrayList<Food> getNeighboringFood(int x, int y) {
-		ArrayList<Food> result = new ArrayList<Food>();
-		// Check right side
-		if (x != this.getX() - 1 && this.gameObjects[y][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y][x + 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
+	private int nonLocalNeighbors(int x, int y, int n) {
+		int count = 0;
+		ArrayList<Point> control = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			while (true) {
+				int randY = random.nextInt(this.getY());
+				int randX = random.nextInt(this.getX());
+				// If random location is not one of the local cells or cell
+				// itself
+				if (!((randX == x && randY == y) ||
+					(randX == x && randY == y - 1) ||
+					(randX == x && randY == y + 1) ||
+					(randX == x + 1 && randY == y) ||
+					(randX == x - 1 && randY == y) ||
+					(randX == x + 1 && randY == y + 1) ||
+					(randX == x - 1 && randY == y - 1) ||
+					(randX == x - 1 && randY == y + 1) ||
+					(randX == x + 1 && randY == y - 1))){
+					// Current point
+					Point currentPoint = new Point(randX, randY);
+					// If there is no such point in control list
+					if (!control.contains(currentPoint)) {
+						// Add this point to control list
+						control.add(currentPoint);
+						// Get creature
+						Creature creature = (Creature) this.gameObjects[randY][randX];
+						// If creature is alive, add 1 to count
+						if (creature.getStatus()) {
+							count++;
+						}
+						// Break from loop to look for next random neighbor
+						break;
+					}
+				}
 			}
 		}
-		// Check cells on bottom right
-		if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x + 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
+		return count;
+	}
+
+	/**
+	 * Method assigns a value to variable locality that determines fraction of
+	 * local and non-local cells should be checked for living creatures out of
+	 * total of 8 cells. In case provided value is invalid, throws Exception.
+	 * 
+	 * @param value
+	 *            value must be in range [0, 8]
+	 */
+	public void setLocality(int value) throws Exception {
+		if (value < 0 || value > 8) {
+			throw new Exception("Invalid value provided. Locality must be in range [0, 8].");
 		}
-		// Check cells on bottom
-		if (y != this.getY() - 1 && this.gameObjects[y + 1][x] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		// Check cells on left bottom corner
-		if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y + 1][x - 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		// Check left side
-		if (x > 0 && this.gameObjects[y][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y][x - 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		// Check top
-		if (y > 0 && this.gameObjects[y - 1][x] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		// Check top left corner
-		if (x > 0 && y > 0 && this.gameObjects[y - 1][x - 1] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x - 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		// Check top right corner
-		if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
-			GameObject currObject = this.gameObjects[y - 1][x + 1];
-			if (currObject.getType().equals("Food")) {
-				Food food = (Food) currObject;
-				result.add(food);
-			}
-		}
-		return result;
+		this.locality = value;
 	}
 
 	/**
@@ -431,28 +490,22 @@ public class Grid {
 	public static void main(String[] args) throws Exception {
 		int x = 5, y = 5;
 		Grid grid = new Grid(x, y);
-		/*
-		 * for (int i = 0; i < 16; i++) { grid.addObject(new Creature()); }
-		 */
-
-		grid.addObject(new Creature(), 1, 1);
-		grid.addObject(new Creature(), 1, 2);
-		grid.addObject(new Creature(), 2, 1);
-		grid.addObject(new Creature(), 2, 2);
-		grid.addObject(new Creature(), 3, 3);
-		grid.addObject(new Creature(), 3, 4);
-		grid.addObject(new Creature(), 4, 3);
-		grid.addObject(new Creature(), 4, 4);
-
-		System.out.println("----------------- Initial state -------------------");
-		grid.printGrid();
-		grid.update();
-		System.out.println("----------------- Post update -------------------");
-		grid.printGrid();
-		grid.update();
-		System.out.println("----------------- Post update 2 -------------------");
-		grid.printGrid();
-		System.out.println("----------------- Post update 3 --------------------");
+		while (!grid.isFull()) {
+			grid.addObject(new CreatureSimple());
+		}
+		
+		// Test  nonLocalNeighbors  method
+		for (int i = 0; i < 9; i++) {
+			System.out.println(grid.nonLocalNeighbors(1, 1, i));
+		}
+		System.out.println();
+		
+		// Test  neighborsInDirections  method
+		ArrayList<Integer> direction = new ArrayList<>();
+		for (int i = 0; i < 8; i++) {
+			direction.add(i);
+			System.out.println(grid.neighborsInDirections(1, 1, direction));
+		}
 	}
 
 }
