@@ -6,7 +6,7 @@ import java.util.Random;
 
 
 /**
- * Wrapper class for game logic.
+ * Wrapper class for game logic. Pass Grid object in constructor
  * @author student
  *
  */
@@ -54,6 +54,17 @@ public class GameLogic {
         }
     }
     
+    /**
+     * Initializes GameObject 2D array with according to indicated type parameter.
+     * type parameter should have following values:
+     *     1) default - evenly generates three type of creatures
+     *     2) classic
+     *     3) dependant
+     *     4) nondependant
+     *     5) mix 
+     * @param type
+     * @throws Exception
+     */
     public void initializeGrid(String type) throws Exception {
         this.grid.reset();
         switch (type) {
@@ -116,26 +127,43 @@ public class GameLogic {
         default:
             break;
         }
-        
-        
     }
     
+    /**
+     * Method for retrieving length of the grid.
+     * @return
+     */
     public int getBoardLength() {
         return this.grid.getX();
     }
     
+    /**
+     * Method for retrieving width of the grid.
+     * @return
+     */
     public int getBoardWidth() {
         return this.grid.getY();
     }
     
+    /**
+     * Introduces next generation in simulation.
+     */
     public void nextTurn() {
         this.grid.update();
     }
     
+    /**
+     * Returns 2D GameObjects array containing objects of the simulation 
+     * @return
+     */
     public GameObject[][] getGridObjects() {
         return this.grid.getGameObjects();
     }
     
+    /**
+     * Returns map with creature type and number of creatures alive
+     * @return
+     */
     public HashMap<String, Integer> getNumberOfAliveCreatures() {
         return this.grid.getNumberOfAliveCreatures();
     }
