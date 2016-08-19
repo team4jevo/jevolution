@@ -295,6 +295,19 @@ public class Grid {
         }
         return count;
     }
+    
+    /**
+     * Method returns number of both local and non-local living neighbors
+     * @param x
+     * @param y
+     * @param p
+     * @return
+     */
+    private int getLivingNeighborsHybrid(int x, int y, double p) {
+        int count = 0;
+        // TODO Finish this method
+        return count;
+    }
 
     /**
      * Method returns ArrayList of Food objects that neighbor certain cell.

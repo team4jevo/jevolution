@@ -49,13 +49,13 @@ public class LogicVisualizer {
     public static void main(String[] args) throws Exception {
         Grid grid = new Grid(25, 25);
         GameLogic gameLogic = new GameLogic(grid);
-        // gameLogic.initializeGrid("classic");
+        //gameLogic.initializeGrid("classic");
         // Turn on animation mode
         StdDraw.enableDoubleBuffering();
         LogicVisualizer.draw(gameLogic);
         StdDraw.show();
         StdDraw.pause(LogicVisualizer.DELAY);
-        for (int i = 0; i < 3000; i++) {
+        for (int i = 0; i < 5000; i++) {
             gameLogic.nextTurn();
             LogicVisualizer.draw(gameLogic);
             StdDraw.show();

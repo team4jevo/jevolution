@@ -70,6 +70,49 @@ public class GameLogic {
                 }
             }
             break;
+        case "dependant":
+            for (int i = 0; i < this.grid.getY(); i++) {
+                for (int j = 0; j < this.grid.getX(); j++) {
+                    CreatureDependant cd = new CreatureDependant();
+                    cd.setStatus(random.nextBoolean());
+                    cd.setLocation(j, i);
+                    this.grid.addObject(cd, j, i);
+                }
+            }
+            break;
+        case "nondependant":
+            for (int i = 0; i < this.grid.getY(); i++) {
+                for (int j = 0; j < this.grid.getX(); j++) {
+                    CreatureNonDependant cnd = new CreatureNonDependant();
+                    cnd.setStatus(random.nextBoolean());
+                    cnd.setLocation(j, i);
+                    this.grid.addObject(cnd, j, i);
+                }
+            }
+            break;
+        case "mix":
+            for (int i = 0; i < this.grid.getY(); i++) {
+                for (int j = 0; j < this.grid.getX(); j++) {
+                    int n = random.nextInt(2);
+                    switch(n) {
+                    case 0:
+                        CreatureDependant cd = new CreatureDependant();
+                        cd.setStatus(random.nextBoolean());
+                        cd.setLocation(j, i);
+                        this.grid.addObject(cd, j, i);
+                        break;
+                    case 1:
+                        CreatureNonDependant cnd = new CreatureNonDependant();
+                        cnd.setStatus(random.nextBoolean());
+                        cnd.setLocation(j, i);
+                        this.grid.addObject(cnd, j, i);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            break;
         default:
             break;
         }
