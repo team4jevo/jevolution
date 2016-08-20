@@ -49,8 +49,8 @@ public class LogicVisualizer {
     public static void main(String[] args) throws Exception {
         Grid grid = new Grid(50, 50);
         GameLogic gameLogic = new GameLogic(grid);
-        gameLogic.initializeGrid("mix1");
-        gameLogic.setLocality(3);
+        //gameLogic.initializeGrid("classic");
+        gameLogic.setLocality(0);
         // Turn on animation mode
         StdDraw.enableDoubleBuffering();
         LogicVisualizer.draw(gameLogic);
