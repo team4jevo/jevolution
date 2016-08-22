@@ -178,18 +178,20 @@ public class Grid {
             for (int x = 0; x < this.getX(); x++) {
                 if (this.gameObjects[y][x] != null) {
                     GameObject currObject = this.gameObjects[y][x];
-                    if (!currObject.getType().equals("Food")) {
+                    // If class of current game object is Creature class or one of the
+                    // sub classes of Creature class
+                    if (Creature.class.isInstance(currObject)) {
                         Creature cr = (Creature) currObject;
                         boolean statusAfter = false;
                         boolean statusBefore = cr.getStatus();
                         int neighborCount = this.getLivingNeighbors(x, y, this.locality);
-                        if (currObject.getType().equals("CreatureSimple")) {
+                        if (CreatureSimple.class.isInstance(cr)) {
                             CreatureSimple creature = (CreatureSimple) currObject;
                             statusAfter = creature.survives(neighborCount);
-                        } else if (currObject.getType().equals("CreatureDependant")) {
+                        } else if (CreatureDependant.class.isInstance(cr)) {
                             CreatureDependant creature = (CreatureDependant) currObject;
                             statusAfter = creature.survives(neighborCount);
-                        } else if (currObject.getType().equals("CreatureNonDependant")) {
+                        } else if (CreatureNonDependant.class.isInstance(cr)) {
                             CreatureNonDependant creature = (CreatureNonDependant) currObject;
                             statusAfter = creature.survives(neighborCount);
                         }

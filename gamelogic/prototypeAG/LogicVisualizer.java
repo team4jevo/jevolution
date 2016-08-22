@@ -6,7 +6,7 @@ import edu.princeton.cs.algs4.StdDraw;
 
 public class LogicVisualizer {
     // Delay in seconds
-    private static final int DELAY = 100;
+    private static final int DELAY = 10;
 
     public static void draw(GameLogic gameLogic) {
         StdDraw.clear();
@@ -16,21 +16,29 @@ public class LogicVisualizer {
         StdDraw.filledSquare(gameLogic.getBoardLength() / 2.0, gameLogic.getBoardLength() / 2.0 + 1,
                 gameLogic.getBoardLength() / 2.0);
 
+        // Get grid objects and grid size
+        GameObject[][] gridObjects = gameLogic.getGridObjects();
+        int gridLength = gameLogic.getBoardLength();
+        int gridWidth = gameLogic.getBoardWidth();
         // Draw grid
-        for (int row = 0; row < gameLogic.getBoardLength(); row++) {
-            for (int col = 0; col < gameLogic.getBoardWidth(); col++) {
-                Creature cr = (Creature) gameLogic.getGridObjects()[col][row];
-                if (cr.getStatus()) {
-                    if (cr.getType().equals("CreatureSimple")) {
-                        StdDraw.setPenColor(StdDraw.BLACK);
-                    } else if (cr.getType().equals("CreatureDependant")) {
-                        StdDraw.setPenColor(StdDraw.BLUE);
-                    } else if (cr.getType().equals("CreatureNonDependant")) {
-                        StdDraw.setPenColor(StdDraw.GREEN);
+        for (int row = 0; row < gridLength; row++) {
+            for (int col = 0; col < gridWidth; col++) {
+                GameObject gameObject = gridObjects[col][row];
+                if (Creature.class.isInstance(gameObject)) {
+                    Creature cr = (Creature) gameLogic.getGridObjects()[col][row];
+                    if (cr.getStatus()) {
+                        if (CreatureSimple.class.isInstance(cr)) {
+                            StdDraw.setPenColor(StdDraw.BLACK);
+                        } else if (CreatureDependant.class.isInstance(cr)) {
+                            StdDraw.setPenColor(StdDraw.BLUE);
+                        } else if (CreatureNonDependant.class.isInstance(cr)) {
+                            StdDraw.setPenColor(StdDraw.GREEN);
+                        }
+                    } else {
+                        StdDraw.setPenColor(StdDraw.WHITE);
                     }
-                } else {
-                    StdDraw.setPenColor(StdDraw.WHITE);
                 }
+                
                 StdDraw.filledSquare(col + 0.5, gameLogic.getBoardWidth() - row + 0.5, 0.49);
             }
         }
@@ -47,7 +55,7 @@ public class LogicVisualizer {
     }
 
     public static void main(String[] args) throws Exception {
-        Grid grid = new Grid(50, 50);
+        Grid grid = new Grid(30, 30);
         GameLogic gameLogic = new GameLogic(grid);
         //gameLogic.initializeGrid("classic");
         gameLogic.setLocality(0);

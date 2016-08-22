@@ -6,6 +6,7 @@ import java.awt.Point;
 
 class Creature extends GameObject {
     private boolean isAlive;
+    private int cooperativeness;
     
     Creature() {
         this.isAlive = true;
@@ -13,10 +14,19 @@ class Creature extends GameObject {
     
     public void setStatus(boolean status) {
         this.isAlive = status;
+        this.cooperativeness = 0;
     }
     
     public boolean getStatus() {
         return this.isAlive;
+    }
+    
+    public void setCooperativeness(int value) {
+        this.cooperativeness = value;
+    }
+    
+    public int getCooperativeness() {
+        return this.cooperativeness;
     }
     
     @Override
