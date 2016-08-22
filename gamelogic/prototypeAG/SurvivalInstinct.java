@@ -1,5 +1,8 @@
 package gamelogic;
 
+import java.util.ArrayList;
+
+
 interface SurvivalInstinct {
-    boolean survives(int nNeighbors);
+    boolean survives(ArrayList<Creature> liveNeighbors);
 }

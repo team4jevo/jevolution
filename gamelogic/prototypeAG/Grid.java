@@ -8,7 +8,6 @@ public class Grid {
     private boolean[][] nextState;
     private Random random;
     private HashMap<String, Integer> aliveCreatures;
-    private int locality;
 
     /**
      * Grid constructor.
@@ -30,7 +29,6 @@ public class Grid {
         this.nextState = new boolean[y][x];
         this.random = new Random();
         this.aliveCreatures = new HashMap<>();
-        this.locality = 0;
     }
 
     public int getX() {
@@ -184,7 +182,20 @@ public class Grid {
                         Creature cr = (Creature) currObject;
                         boolean statusAfter = false;
                         boolean statusBefore = cr.getStatus();
-                        int neighborCount = this.getLivingNeighbors(x, y, this.locality);
+                        // Get neighbors for creature, both local and non-local depending on level of locality of
+                        // a particular group
+                        ArrayList<Creature> neighborCount;
+                        int locality = 0;
+                        if (CreatureSimple.class.isInstance(cr)) {
+                            locality = CreatureSimple.getNeighborNonLocality();
+                        }
+                        if (CreatureNonDependant.class.isInstance(cr)) {
+                            locality = CreatureNonDependant.getNeighborNonLocality();
+                        }
+                        if (CreatureDependant.class.isInstance(cr)) {
+                            locality = CreatureDependant.getNeighborNonLocality();
+                        }
+                        neighborCount = this.getLivingNeighbors(x, y, locality);
                         if (CreatureSimple.class.isInstance(cr)) {
                             CreatureSimple creature = (CreatureSimple) currObject;
                             statusAfter = creature.survives(neighborCount);
@@ -252,11 +263,11 @@ public class Grid {
      *            cells.
      * @return number of living creatures in local and non-local cells checked
      */
-    private int getLivingNeighbors(int x, int y, int locality) {
+    private ArrayList<Creature> getLivingNeighbors(int x, int y, int locality) {
         // List that contains local directions that should should be checked
         ArrayList<Integer> directions = new ArrayList<>();
         assert (locality >= 0 && locality <= 8) : "Invalid input. Paramater (locality) should be in range [0, 8].";
-        int count = 0;
+        ArrayList<Creature> ans = new ArrayList<>();
         // Randomly determine local unique cells which should be checked
         while (directions.size() < 8 - locality) {
             int randomDirection = random.nextInt(8);
@@ -265,10 +276,10 @@ public class Grid {
             }
         }
         // Determine number of local living neighbors
-        count += neighborsInDirections(x, y, directions);
+        ans.addAll(neighborsInDirections(x, y, directions));
         // Determine number of non-local living neighbors
-        count += nonLocalNeighbors(x, y, locality);
-        return count;
+        ans.addAll(nonLocalNeighbors(x, y, locality));
+        return ans;
     }
 
     /**
@@ -284,8 +295,8 @@ public class Grid {
      *            relative to the cell should be checked
      * @return number of living creatures
      */
-    private int neighborsInDirections(int x, int y, ArrayList<Integer> directions) {
-        int count = 0;
+    private ArrayList<Creature> neighborsInDirections(int x, int y, ArrayList<Integer> directions) {
+        ArrayList<Creature> ans = new ArrayList<>();
         for (int i = 0; i < directions.size(); i++) {
             int currentDirection = directions.get(i);
             switch (currentDirection) {
@@ -296,7 +307,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -308,7 +319,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -320,7 +331,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -332,7 +343,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -344,7 +355,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -356,7 +367,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -368,7 +379,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -380,7 +391,7 @@ public class Grid {
                     if (!currObject.getType().equals("Food")) {
                         Creature creature = (Creature) currObject;
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                     }
                 }
@@ -389,7 +400,7 @@ public class Grid {
                 break;
             }
         }
-        return count;
+        return ans;
     }
 
     /**
@@ -407,8 +418,8 @@ public class Grid {
      *            number of random cells that should be checked
      * @return number of living creatures in checked cells
      */
-    private int nonLocalNeighbors(int x, int y, int n) {
-        int count = 0;
+    private ArrayList<Creature> nonLocalNeighbors(int x, int y, int n) {
+        ArrayList<Creature> ans = new ArrayList<>();
         ArrayList<Point> control = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             while (true) {
@@ -435,7 +446,7 @@ public class Grid {
                         Creature creature = (Creature) this.gameObjects[randY][randX];
                         // If creature is alive, add 1 to count
                         if (creature.getStatus()) {
-                            count++;
+                            ans.add(creature);
                         }
                         // Break from loop to look for next random neighbor
                         break;
@@ -443,22 +454,7 @@ public class Grid {
                 }
             }
         }
-        return count;
-    }
-
-    /**
-     * Method assigns a value to variable locality that determines fraction of
-     * local and non-local cells should be checked for living creatures out of
-     * total of 8 cells. In case provided value is invalid, throws Exception.
-     * 
-     * @param value
-     *            value must be in range [0, 8]
-     */
-    public void setLocality(int value) throws Exception {
-        if (value < 0 || value > 8) {
-            throw new Exception("Invalid value provided. Locality must be in range [0, 8].");
-        }
-        this.locality = value;
+        return ans;
     }
 
     /**

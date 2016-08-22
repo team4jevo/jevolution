@@ -221,18 +221,28 @@ public class GameLogic {
         return this.grid.getNumberOfAliveCreatures();
     }
 
-    /**
-     * Method passes provided value to Grid object's method setLocality that
-     * determines fraction of local and non-local cells to be checked out of 8
-     * total cells
-     * 
-     * @param value
-     *            Must be in range [0, 8]
-     * @throws Exception
-     *             Throws exception if invalid value has been passed
-     */
-    public void setLocality(int value) throws Exception {
-        this.grid.setLocality(value);
+    public void setNonLocality(String simpleClassName, int value) throws Exception {
+        if (CreatureSimple.class.getSimpleName().equals(simpleClassName)) {
+            CreatureSimple.setNeighborNonLocality(value);
+        }
+        if (CreatureDependant.class.getSimpleName().equals(simpleClassName)) {
+            CreatureDependant.setNeighborNonLocality(value);
+        }
+        if (CreatureNonDependant.class.getSimpleName().equals(simpleClassName)) {
+            CreatureNonDependant.setNeighborNonLocality(value);
+        }
+    }
+    
+    public void setCooperativeness(String simpleClassName, int value) throws Exception {
+        if (CreatureSimple.class.getSimpleName().equals(simpleClassName)) {
+            CreatureSimple.setCooperativeness(value);
+        }
+        if (CreatureDependant.class.getSimpleName().equals(simpleClassName)) {
+            CreatureDependant.setCooperativeness(value);
+        }
+        if (CreatureNonDependant.class.getSimpleName().equals(simpleClassName)) {
+            CreatureNonDependant.setCooperativeness(value);
+        }
     }
 
 }
