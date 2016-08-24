@@ -1,10 +1,10 @@
-package gamelogic2;
+package customgl;
 
 import java.awt.Point;
 import java.util.*;
 
 public class LocalGrid {
-    private graphics.GameObject[][] gameObjects;
+    private jevo.GameObject[][] gameObjects;
     private boolean[][] nextState;
     private Random random;
     private HashMap<String, ArrayList<LocalCreature>> creaturesTotal; // TODO
@@ -31,7 +31,7 @@ public class LocalGrid {
         if (x < 5 || x > 100 || y < 5 || y > 100) {
             throw new Exception("Invalid parameters to Grid constructor provided. x and y must be in range [5, 100].");
         }
-        this.gameObjects = new graphics.GameObject[y][x];
+        this.gameObjects = new jevo.GameObject[y][x];
         this.nextState = new boolean[y][x];
         this.random = new Random();
         this.creaturesTotal = new HashMap<>();
@@ -54,7 +54,7 @@ public class LocalGrid {
      * @return
      * @throws Exception
      */
-    public graphics.GameObject getGameObject(int x, int y) throws Exception {
+    public jevo.GameObject getGameObject(int x, int y) throws Exception {
         if (x < 0 || x >= this.getX() || y < 0 || y >= this.getY()) {
             throw new Exception("Invalid indexes provided!");
         }
@@ -79,7 +79,7 @@ public class LocalGrid {
      *             throws exception if invalid x and y values are provided, cell
      *             is already taken or 2d array containing game objects is full
      */
-    public void addObject(graphics.GameObject object) throws Exception {
+    public void addObject(jevo.GameObject object) throws Exception {
         // Get x and y coordinates from object
         int objX = object.getLogicX();
         int objY = object.getLogicY();
@@ -91,17 +91,17 @@ public class LocalGrid {
             if (this.gameObjects[objY][objX] != null) {
                 throw new Exception("Cannot add element in x=" + objX + ", y=" + objY + ". Cell taken.");
             }
-            if (!object.getType().equals("Food")) {
+            if (!object.getGoType().equals("Food")) {
                 LocalCreature creature = (LocalCreature) object;
                 if (creature.getState()) {
-                    if (creaturesTotal.containsKey(creature.getType())) {
-                        ArrayList<LocalCreature> currList = creaturesTotal.get(creature.getType());
+                    if (creaturesTotal.containsKey(creature.getGoType())) {
+                        ArrayList<LocalCreature> currList = creaturesTotal.get(creature.getGoType());
                         currList.add(creature);
-                        creaturesTotal.put(creature.getType(), currList);
+                        creaturesTotal.put(creature.getGoType(), currList);
                     } else {
                         ArrayList<LocalCreature> currList = new ArrayList<>();
                         currList.add(creature);
-                        creaturesTotal.put(creature.getType(), currList);
+                        creaturesTotal.put(creature.getGoType(), currList);
                     }
                 }
             }
@@ -120,15 +120,15 @@ public class LocalGrid {
     void printGrid() {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
-                graphics.GameObject currObject = gameObjects[y][x];
+                jevo.GameObject currObject = gameObjects[y][x];
                 if (currObject == null) {
                     System.out.print(" ");
-                } else if (!currObject.getType().equals("Food")) {
+                } else if (!currObject.getGoType().equals("Food")) {
                     LocalCreature creature = (LocalCreature) currObject;
                     if (creature.getState()) {
-                        if (creature.getType().equals("CreatureSimple")) {
+                        if (creature.getGoType().equals("CreatureSimple")) {
                             System.out.print("A");
-                        } else if (creature.getType().equals("CreatureDependant")) {
+                        } else if (creature.getGoType().equals("CreatureDependant")) {
                             System.out.print("B");
                         } else {
                             System.out.print("C");
@@ -181,7 +181,7 @@ public class LocalGrid {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
                 if (this.gameObjects[y][x] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y][x];
+                    jevo.GameObject currObject = this.gameObjects[y][x];
                     // If class of current game object is Creature class or one
                     // of the
                     // sub classes of Creature class
@@ -220,7 +220,7 @@ public class LocalGrid {
                         }
                         // If most frequent creature around is of other type
                         String mostFrequent = mostFrequentCreatureAsNeighbor(neighborCount);
-                        if (!cr.getType().equals(mostFrequent)) {
+                        if (!cr.getGoType().equals(mostFrequent)) {
                             // Get corresponding aggressiveness of most common
                             // neighbor type
                             int aggressiveness = 0;
@@ -246,9 +246,9 @@ public class LocalGrid {
                                 // than probability
                                 if (random.nextDouble() < p) {
                                     // Remove one creature of current type
-                                    ArrayList<LocalCreature> list = this.creaturesTotal.get(cr.getType());
+                                    ArrayList<LocalCreature> list = this.creaturesTotal.get(cr.getGoType());
                                     list.remove(cr);
-                                    this.creaturesTotal.put(cr.getType(), list);
+                                    this.creaturesTotal.put(cr.getGoType(), list);
                                     // Replace creature
                                     newCreature.setState(statusAfter);
                                     newCreature.setLogicX(x);
@@ -256,9 +256,9 @@ public class LocalGrid {
                                     this.gameObjects[y][x] = newCreature;
                                     // Add new creature to total of such
                                     // creatures
-                                    ArrayList<LocalCreature> list2 = this.creaturesTotal.get(newCreature.getType());
+                                    ArrayList<LocalCreature> list2 = this.creaturesTotal.get(newCreature.getGoType());
                                     list2.add(newCreature);
-                                    this.creaturesTotal.put(cr.getType(), list2);
+                                    this.creaturesTotal.put(cr.getGoType(), list2);
                                 }
                             }
                         } else {
@@ -275,7 +275,7 @@ public class LocalGrid {
     private String mostFrequentCreatureAsNeighbor(ArrayList<LocalCreature> liveNeighbors) {
         HashMap<String, Integer> neighborMap = new HashMap<>();
         for (LocalCreature creature : liveNeighbors) {
-            String type = creature.getType();
+            String type = creature.getGoType();
             if (!neighborMap.containsKey(type)) {
                 neighborMap.put(type, 1);
             } else {
@@ -299,7 +299,7 @@ public class LocalGrid {
      * 
      * @return 2d array with game objects
      */
-    public graphics.GameObject[][] getGameObjects() {
+    public jevo.GameObject[][] getGameObjects() {
         return this.gameObjects;
     }
 
@@ -373,8 +373,8 @@ public class LocalGrid {
             case 0:
                 // Check right side
                 if (x != this.getX() - 1 && this.gameObjects[y][x + 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y][x + 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y][x + 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -385,8 +385,8 @@ public class LocalGrid {
             case 1:
                 // Check top right corner
                 if (x < this.getX() - 1 && y > 0 && this.gameObjects[y - 1][x + 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y - 1][x + 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y - 1][x + 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -397,8 +397,8 @@ public class LocalGrid {
             case 2:
                 // Check top
                 if (y > 0 && this.gameObjects[y - 1][x] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y - 1][x];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y - 1][x];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -409,8 +409,8 @@ public class LocalGrid {
             case 3:
                 // Check top left corner
                 if (x > 0 && y > 0 && this.gameObjects[y - 1][x - 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y - 1][x - 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y - 1][x - 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -421,8 +421,8 @@ public class LocalGrid {
             case 4:
                 // Check left side
                 if (x > 0 && this.gameObjects[y][x - 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y][x - 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y][x - 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -433,8 +433,8 @@ public class LocalGrid {
             case 5:
                 // Check cells on left bottom corner
                 if (x > 0 && y != this.getY() - 1 && this.gameObjects[y + 1][x - 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y + 1][x - 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y + 1][x - 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -445,8 +445,8 @@ public class LocalGrid {
             case 6:
                 // Check cells on bottom
                 if (y != this.getY() - 1 && this.gameObjects[y + 1][x] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y + 1][x];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y + 1][x];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -457,8 +457,8 @@ public class LocalGrid {
             case 7:
                 // Check cells on bottom right
                 if (x != this.getX() - 1 && y != this.getY() - 1 && this.gameObjects[y + 1][x + 1] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y + 1][x + 1];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y + 1][x + 1];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         if (creature.getState()) {
                             ans.add(creature);
@@ -531,8 +531,8 @@ public class LocalGrid {
         for (int y = 0; y < this.nextState.length; y++) {
             for (int x = 0; x < this.nextState[0].length; x++) {
                 if (this.gameObjects[y][x] != null) {
-                    graphics.GameObject currObject = this.gameObjects[y][x];
-                    if (!currObject.getType().equals("Food")) {
+                    jevo.GameObject currObject = this.gameObjects[y][x];
+                    if (!currObject.getGoType().equals("Food")) {
                         LocalCreature creature = (LocalCreature) currObject;
                         creature.setState(this.nextState[y][x]);
                         this.gameObjects[y][x] = creature;

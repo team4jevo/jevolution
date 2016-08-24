@@ -1,4 +1,4 @@
-package gamelogic2;
+package customgl;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,7 +17,7 @@ public class CreatureSimple extends LocalCreature implements SurvivalInstinct {
     private static Random random = new Random();
     
     public CreatureSimple(int x, int y) {
-        super(CreatureSimple.class.getSimpleName(), x, y);
+        super("CS", x, y);
     }
     
     public static int getAggressiveness() {

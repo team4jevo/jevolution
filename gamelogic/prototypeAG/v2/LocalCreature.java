@@ -1,7 +1,7 @@
-package gamelogic2;
+package customgl;
 
 
-class LocalCreature extends graphics.GameObject {
+class LocalCreature extends jevo.GameObject {
     static final double SIGMA = 0.01;
     static final double K = 0.03162277660168379;
     private boolean isAlive;
