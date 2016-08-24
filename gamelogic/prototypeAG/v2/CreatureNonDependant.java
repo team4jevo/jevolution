@@ -17,7 +17,8 @@ public class CreatureNonDependant extends LocalCreature implements SurvivalInsti
     private static Random random = new Random();
     
     public CreatureNonDependant(int x, int y) {
-        super(CreatureNonDependant.class.getSimpleName(), x, y);
+        //super(CreatureNonDependant.class.getSimpleName(), x, y);
+        super("CND", x ,y);
     }
     
     public static int getAggressiveness() {

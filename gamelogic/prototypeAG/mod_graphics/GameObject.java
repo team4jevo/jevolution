@@ -32,8 +32,7 @@ public class GameObject {
         // delete it from token array
         // it should be implemented in Graphics tier
         token.die();
-       token = null;
-
+        token = null;
     }
 
     public int getLogicX(){
@@ -52,6 +51,6 @@ public class GameObject {
     }
     
     public String getType() {
-        return this.getClass().getSimpleName();
+        return this.type;
     }
 }

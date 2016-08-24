@@ -17,7 +17,8 @@ public class CreatureDependant extends LocalCreature implements SurvivalInstinct
     private static Random random = new Random();
     
     public CreatureDependant(int x, int y) {
-        super(CreatureDependant.class.getSimpleName(), x, y);
+        //super(CreatureDependant.class.getSimpleName(), x, y);
+        super("CD", x, y);
     }
     
     public static int getAggressiveness() {

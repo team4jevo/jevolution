@@ -1,5 +1,8 @@
 package graphics;
+
 import java.util.Random;
+
+import gamelogic2.CreatureSimple;
 
 /**
  * Created by LongJohn on 8/19/2016.
@@ -47,13 +50,22 @@ public class GameLogic {
             for (int x = 0; x < this.grid.getX(); x++) {
                 switch (this.random.nextInt(3)) {
                 case 0:
-                    this.grid.addObject(new gamelogic2.CreatureSimple(x, y));
+                    gamelogic2.CreatureSimple cs = new gamelogic2.CreatureSimple(
+                            x, y);
+                    cs.setState(random.nextBoolean());
+                    this.grid.addObject(cs);
                     break;
                 case 1:
-                    this.grid.addObject(new gamelogic2.CreatureNonDependant(x, y));
+                    gamelogic2.CreatureNonDependant cnd = new gamelogic2.CreatureNonDependant(
+                            x, y);
+                    cnd.setState(random.nextBoolean());
+                    this.grid.addObject(cnd);
                     break;
                 case 2:
-                    this.grid.addObject(new gamelogic2.CreatureDependant(x, y));
+                    gamelogic2.CreatureDependant cd = new gamelogic2.CreatureDependant(
+                            x, y);
+                    cd.setState(random.nextBoolean());
+                    this.grid.addObject(cd);
                     break;
                 default:
                     break;
@@ -62,7 +74,8 @@ public class GameLogic {
         }
     }
 
-    public void initializeGrid(int xSize, int ySize, String creatureSetup) throws Exception {
+    public void initializeGrid(int xSize, int ySize, String creatureSetup)
+            throws Exception {
         // TODO finish this method
         this.currentCreatureSetup = creatureSetup;
         this.grid = new gamelogic2.LocalGrid(xSize, ySize);
@@ -75,53 +88,80 @@ public class GameLogic {
         }
     }
 
-    public void nextTurn() {
+    public void nextTurn() throws Exception {
 
         System.out.println("next turn in game logic ");
-        /*
+        this.grid.update();
+        // Loop over all elements
         for (int y = 0; y < this.grid.getY(); y++) {
             for (int x = 0; x < this.grid.getX(); x++) {
-                
+                // If null, continue
                 if (this.grid.getGameObject(x, y) == null) {
-                    System.out.println("found empty cell ");
-                    
-                     * if (Math.random()<0.01){ System.out.println
-                     * ("adding object"); field [x][y] = new
-                     * GameObject("f",x,y); field [x][y].setToken
-                     * (ge.createToken (field [x][y])); }
-                     
-                } else if ((Math.random() < 0.5)) {
-                    try {
-                        System.out.println("moving token");
-
-                        field[x][y].getToken().move(1, -1);
-                        field[x + 1][y - 1] = field[x][y];
-                        field[x][y] = null;
-
-                    } catch (Exception e) {
-                        System.out.println("some other time");
-                    }
-
-                } else if (Math.random() > 0.5) {
-                    System.out.println("removing token");
-                    field[x][y].removeToken();
-                    field[x][y] = null;
-
+                    continue;
                 }
-
+                GameObject currentGameObject = this.grid.getGameObject(x, y);
+                if (gamelogic2.LocalCreature.class
+                        .isInstance(currentGameObject)) {
+                    gamelogic2.LocalCreature currentCreature = (gamelogic2.LocalCreature) currentGameObject;
+                    if (currentCreature.getState()) {
+                        // Set token if not already set
+                        if (currentCreature.getToken() == null) {
+                            currentCreature.setToken(this.ge.createToken(currentCreature));
+                        }
+                    } else {
+                        // Remove token if it exists
+                        if (currentCreature.getToken() != null) {
+                            currentCreature.removeToken();
+                        }
+                    }
+                }
             }
         }
-        */
+
+        /*
+         * for (int y = 0; y < this.grid.getY(); y++) { for (int x = 0; x <
+         * this.grid.getX(); x++) {
+         * 
+         * if (this.grid.getGameObject(x, y) == null) {
+         * System.out.println("found empty cell ");
+         * 
+         * if (Math.random()<0.01){ System.out.println ("adding object"); field
+         * [x][y] = new GameObject("f",x,y); field [x][y].setToken
+         * (ge.createToken (field [x][y])); }
+         * 
+         * } else if ((Math.random() < 0.5)) { try {
+         * System.out.println("moving token");
+         * 
+         * field[x][y].getToken().move(1, -1); field[x + 1][y - 1] =
+         * field[x][y]; field[x][y] = null;
+         * 
+         * } catch (Exception e) { System.out.println("some other time"); }
+         * 
+         * } else if (Math.random() > 0.5) {
+         * System.out.println("removing token"); field[x][y].removeToken();
+         * field[x][y] = null;
+         * 
+         * }
+         * 
+         * } }
+         */
 
     }
 
     public void newGame() throws Exception {
-        this.initializeGrid(30, 30, "default");
+        this.initializeGrid(10, 10, "default");
         // set starting creatures
         for (int y = 0; y < this.grid.getY(); y++) {
             for (int x = 0; x < this.grid.getX(); x++) {
-                graphics.GameObject currentGameObject = this.grid.getGameObject(x, y);
-                currentGameObject.setToken(ge.createToken(currentGameObject));
+                GameObject currentGameObject = this.grid.getGameObject(x, y);
+                if (gamelogic2.LocalCreature.class
+                        .isInstance(currentGameObject)) {
+                    gamelogic2.LocalCreature currentCreature = (gamelogic2.LocalCreature) currentGameObject;
+                    if (currentCreature.getState()) {
+                        currentCreature
+                                .setToken(ge.createToken(currentCreature));
+                    }
+                }
             }
         }
     }

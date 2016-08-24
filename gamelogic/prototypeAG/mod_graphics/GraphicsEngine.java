@@ -20,6 +20,7 @@ public class GraphicsEngine {
 
     public void reset (){
         //erase previous tokens
+        this.field.getChildren().clear();
         tokens = new ArrayList<>();
     }
 

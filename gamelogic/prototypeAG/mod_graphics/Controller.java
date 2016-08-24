@@ -29,7 +29,7 @@ public class Controller {
 
     }
     @FXML
-    protected void handleNextTurn (ActionEvent event){
+    protected void handleNextTurn (ActionEvent event) throws Exception{
             int turns=0;
         try {
             turns = Integer.valueOf(tfTurns.getText());
