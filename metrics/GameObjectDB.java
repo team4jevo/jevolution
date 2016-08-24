@@ -2,6 +2,7 @@ package metrics;
 
 import java.util.ArrayList;
 import java.util.List;
+<<<<<<< HEAD
 import gamelogic2.Organism;
 
 
@@ -156,4 +157,17 @@ public class GameObjectDB {
         return true;
     }
 
+=======
+
+public class GameObjectDB {
+    private List<GameObjectRecord> records;
+    
+    public GameObjectDB() {
+        this.records = new ArrayList<>();
+    }
+    
+    public void addRecord(GameObjectRecord record) {
+        
+    }
+>>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
 }

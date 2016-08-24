@@ -1,4 +1,4 @@
-package gamelogic2;
+package customgl;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,7 +17,10 @@ public class CreatureDependant extends LocalCreature implements SurvivalInstinct
     private static Random random = new Random();
     
     public CreatureDependant(int x, int y) {
+<<<<<<< HEAD
         //super(CreatureDependant.class.getSimpleName(), x, y);
+=======
+>>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
         super("CD", x, y);
     }
     

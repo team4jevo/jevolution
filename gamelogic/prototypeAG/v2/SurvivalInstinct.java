@@ -1,4 +1,4 @@
-package gamelogic2;
+package customgl;
 
 import java.util.ArrayList;
 
