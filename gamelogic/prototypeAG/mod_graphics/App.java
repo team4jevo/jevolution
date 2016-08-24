@@ -19,10 +19,13 @@ public class App extends Application {
 
     @Override
     public void start (Stage stage ) throws Exception {
+        System.out.println("start");
+        System.out.println(getClass().getResource("ui.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("ui.fxml"));
-        // root contains controller somewhere inside;
-
+        //root contains controller inside;
+        System.out.println("root loaded");
         Scene scene = new Scene(root, 800, 800);
+        scene.getStylesheets().add("jevo/style.css");
         stage.setScene (scene);
         stage.show();
     }

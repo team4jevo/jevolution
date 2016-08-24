@@ -42,6 +42,7 @@ package jevo;
 public class GameLogic {
     GraphicsEngine ge;
     int tmpX = 0;
+    GameObject [][] field; // x y
 
     public GameLogic (GraphicsEngine ge) {
 
@@ -52,14 +53,14 @@ public class GameLogic {
         return ge;
     }
 
-    public void nextTurn () throws Exception {
+    public void nextTurn ()throws Exception {
 
 
     }
 
 
 
-    public void newGame() throws Exception {
+    public void newGame ()throws Exception {
 
 
     }

@@ -2,15 +2,20 @@ package jevo;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+
+import static javafx.application.Application.STYLESHEET_CASPIAN;
+import static javafx.application.Application.STYLESHEET_MODENA;
+import static javafx.application.Application.setUserAgentStylesheet;
 
 /**
  * Created by LongJohn on 8/19/2016.
@@ -19,11 +24,11 @@ import javafx.util.Duration;
 public class Controller {
     // this class processes user events and calls needed methods of GameLogic
 
+    //private String selectedSimulation = "simulation 2.1";
+    private Number selectedSimulation = 0 ;
 
-
-
-
-
+    @FXML
+    private ChoiceBox cbGameLogicSelector;
 
 
 
@@ -37,7 +42,7 @@ public class Controller {
     private TableColumn<GameParameter,String> colGoParameter ;
 
     GraphicsEngine ge = new GraphicsEngine();
-    GameLogic gl; //= new GameLogic (ge);
+    GameLogic gl;
 
 
     Timeline timeline = new Timeline (new KeyFrame(
@@ -45,9 +50,9 @@ public class Controller {
             ae -> {
                 System.out.println ("tick");
                 try {
-                    gl.nextTurn ();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    gl.nextTurn();
+                }catch (Exception e){
+                    System.err.print(e);
                 }
             }
     ));
@@ -68,16 +73,31 @@ public class Controller {
     @FXML
     protected void handleNewGame (ActionEvent event) throws Exception {
         System.out.println ("new game");
+        System.out.println (selectedSimulation);
         ge.setPaneField(paneField);
         ge.reset();
         ge.setGoPropTable (tblGoProperties, colGoParameter,colGoValue);
-        gl = new customgl.GameLogic(ge);
+
+        switch (selectedSimulation.intValue()) {
+            case 0:
+                gl = new customgl.GameLogic(ge);
+                break;
+            case 1:
+                gl = new gl21.GameLogic(ge);
+                break;
+            default:
+                gl = new gl21.GameLogic(ge);
+                break;
+        }
         gl.newGame();
+
+      //  setUserAgentStylesheet(STYLESHEET_CASPIAN);
+
 
 
     }
     @FXML
-    protected void handleNextTurn (ActionEvent event){
+    protected void handleNextTurn (ActionEvent event) throws Exception {
             int turns=0;
         try {
             turns = Integer.valueOf(tfTurns.getText());
@@ -86,11 +106,7 @@ public class Controller {
             tfTurns.setText("1");
         }
         for (int i=0;i<turns;i++ ){
-            try {
-                gl.nextTurn();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            gl.nextTurn();
         }
 
         System.out.println ("next turn");
@@ -105,12 +121,9 @@ public class Controller {
 
     @FXML
     protected void handlePlay (ActionEvent event) {
-        System.out.println ("handle play TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
-//        Double turnRate=0.05;
-
 
         if (paused) {
-            System.out.println( "turn Rate "+turnRate);
+            System.out.println( "&&&&&&&&&&&&&&&&&&&&&&&& turn Rate "+turnRate);
             paused = false;
             playBtn.setText("||");
             timeline.setCycleCount(Animation.INDEFINITE);
@@ -131,21 +144,40 @@ public class Controller {
         System.out.println("TextField Action");
         try {
             turnRate = Double.valueOf(tfSpeed.getText())*0.05;
-            if (turnRate > 0.5 ){
-                turnRate = 0.5;
-                tfSpeed.setText("10.0");
+            if (turnRate > 1.5 ){
+                turnRate = 1.5;
+                tfSpeed.setText("30.0");
             }
 
         } catch (Exception e) {
+            System.out.println ("exception in speedchange");
             turnRate = 0.05;
             tfSpeed.setText("1.0");
         }
+        System.out.println (")))))))))))))))))))))))))))))))rate changed = "+turnRate);
         timeline.setRate(turnRate);
 
     }
 
+    @FXML
+    public void initialize(){
 
 
+        System.out.println ("inicialize ");
+        //paneField.setPadding(new Insets(2,2,2,2));
+        cbGameLogicSelector.setItems(FXCollections.observableArrayList(
+                "Jevolution Simulation", "simulation 2.2") // add your stuff here
+        );
+
+        cbGameLogicSelector.getSelectionModel().selectedIndexProperty().addListener (new
+            ChangeListener<Number>() {
+            public void changed (ObservableValue ov, Number value, Number new_value){
+                System.out.println(new_value);
+                selectedSimulation = new_value;
+            }
+        });
+
+    }//ini
 
 
 

@@ -33,7 +33,7 @@ public class GraphicsEngine {
 
 
     private Pane field ;
-    private int tileSize = 30;
+    private int tileSize = 25;
     private List<Token> tokens;
 
     public void setPaneField (Pane field){
@@ -42,8 +42,13 @@ public class GraphicsEngine {
 
     public void reset (){
         //erase previous tokens
+ //       for (Token t :tokens) {
+   //         t.die();
+  //      }
+
+        field.getChildren().clear();
         tokens = new ArrayList<>();
-        this.field.getChildren().clear();
+
     }
 
     public List<Token> getTokens(){

@@ -29,6 +29,7 @@ public class GameObject { // 2DO make this class abstract
     }
 
     public GameObject (String type,int x,int y){
+
         this.type = type;
         this.logicX = x;
         this.logicY = y;
@@ -38,6 +39,7 @@ public class GameObject { // 2DO make this class abstract
         token.move(logicXPath,logicYPath);
         logicX +=logicXPath;
         logicY +=logicYPath;
+
     }
 
 
