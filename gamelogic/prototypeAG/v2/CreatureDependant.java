@@ -16,7 +16,7 @@ public class CreatureDependant extends LocalCreature implements SurvivalInstinct
     private static int neighborNonLocality;
     private static Random random = new Random();
     
-    public CreatureDependant(int x, int y) {
+    public CreatureDependant(int x, int y) throws IllegalArgumentException, IllegalAccessException {
         super("CD", x, y);
     }
     

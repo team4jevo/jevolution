@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.*;
 
 public class LocalGrid {
-    private jevo.GameObject[][] gameObjects;
+    private GameObject[][] gameObjects;
     private boolean[][] nextState;
     private Random random;
 
@@ -25,7 +25,7 @@ public class LocalGrid {
             throw new Exception(
                     "Invalid parameters to Grid constructor provided. x and y must be in range [5, 100].");
         }
-        this.gameObjects = new jevo.GameObject[y][x];
+        this.gameObjects = new GameObject[y][x];
         this.nextState = new boolean[y][x];
         this.random = new Random();
     }
@@ -47,7 +47,7 @@ public class LocalGrid {
      * @return
      * @throws Exception
      */
-    public jevo.GameObject getGameObject(int x, int y) throws Exception {
+    public GameObject getGameObject(int x, int y) throws Exception {
         if (x < 0 || x >= this.getX() || y < 0 || y >= this.getY()) {
             throw new Exception("Invalid indexes provided!");
         }
@@ -72,7 +72,7 @@ public class LocalGrid {
      *             throws exception if invalid x and y values are provided, cell
      *             is already taken or 2d array containing game objects is full
      */
-    public void addObject(jevo.GameObject object) throws Exception {
+    public void addObject(GameObject object) throws Exception {
         // Get x and y coordinates from object
         int objX = object.getLogicX();
         int objY = object.getLogicY();
@@ -157,8 +157,10 @@ public class LocalGrid {
     /**
      * Method updates status of each creature according to rules that govern
      * whether creature in cell survives or not
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
      */
-    public void update() {
+    public void update() throws IllegalArgumentException, IllegalAccessException {
         for (int y = 0; y < this.getY(); y++) {
             for (int x = 0; x < this.getX(); x++) {
                 if (this.gameObjects[y][x] != null) {

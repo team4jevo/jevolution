@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import jevosim.GameObject;;
 
-import jevo.GameObject;
 
 /**
  * Experimenting. Ignore this class for now
@@ -14,7 +14,7 @@ import jevo.GameObject;
  *
  */
 public class GameObjectRecord {
-    private static final int MAX_HISTORY = 250;
+    private static final int MAX_HISTORY = 50;
     private static final Class<?> limitingClass = jevo.GameObject.class;
     private int nUpdate;
     private GameObject gameObject;
