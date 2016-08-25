@@ -1,4 +1,4 @@
-package customgl;
+package jevosim;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,10 +17,6 @@ public class CreatureSimple extends LocalCreature implements SurvivalInstinct {
     private static Random random = new Random();
     
     public CreatureSimple(int x, int y) {
-<<<<<<< HEAD
-        //super(CreatureSimple.class.getSimpleName(), x, y);
-=======
->>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
         super("CS", x, y);
     }
     

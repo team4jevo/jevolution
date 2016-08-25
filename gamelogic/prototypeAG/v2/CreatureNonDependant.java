@@ -1,4 +1,4 @@
-package customgl;
+package jevosim;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,12 +17,7 @@ public class CreatureNonDependant extends LocalCreature implements SurvivalInsti
     private static Random random = new Random();
     
     public CreatureNonDependant(int x, int y) {
-<<<<<<< HEAD
-        //super(CreatureNonDependant.class.getSimpleName(), x, y);
-        super("CND", x ,y);
-=======
         super("CND", x, y);
->>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
     }
     
     public static int getAggressiveness() {

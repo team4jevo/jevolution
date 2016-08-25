@@ -1,5 +1,7 @@
-package customgl;
+package jevosim;
 import java.util.Random;
+
+import javafx.scene.paint.Color;
 
 
 /**
@@ -164,6 +166,15 @@ public class GameLogic extends jevo.GameLogic {
                         // If creature does not have token, add it
                         if (creature.getToken() == null) {
                             creature.setToken(super.getGe().createToken(creature));
+                            if (CreatureSimple.class.isAssignableFrom(creature.getClass())) {
+                                creature.getToken().setColor(Color.GREEN);
+                            }
+                            if (CreatureNonDependant.class.isAssignableFrom(creature.getClass())) {
+                                creature.getToken().setColor(Color.ORANGE);
+                            }
+                            if (CreatureDependant.class.isAssignableFrom(creature.getClass())) {
+                                creature.getToken().setColor(Color.RED);
+                            }
                         }
                     }
                 }
@@ -186,7 +197,16 @@ public class GameLogic extends jevo.GameLogic {
                 if (LocalCreature.class.isInstance(currentGameObject)) {
                     LocalCreature creature = (LocalCreature) currentGameObject;
                     if (creature.getState()) {
-                        currentGameObject.setToken(super.getGe().createToken(currentGameObject));
+                        creature.setToken(super.getGe().createToken(creature));
+                        if (CreatureSimple.class.isAssignableFrom(creature.getClass())) {
+                            creature.getToken().setColor(Color.GREEN);
+                        }
+                        if (CreatureNonDependant.class.isAssignableFrom(creature.getClass())) {
+                            creature.getToken().setColor(Color.ORANGE);
+                        }
+                        if (CreatureDependant.class.isAssignableFrom(creature.getClass())) {
+                            creature.getToken().setColor(Color.RED);
+                        }
                     }
                 }
             }
