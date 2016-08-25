@@ -1,10 +1,13 @@
 package metrics;
 
 
-import jevo.GameObject;
+import jevosim.GameObject;
 
 
 public class SampleSuperObject extends GameObject {
+    public SampleSuperObject() throws IllegalArgumentException, IllegalAccessException {
+        super();
+    }
     private String superString;
     private int superInt;
     private boolean superBoolean;

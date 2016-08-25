@@ -6,6 +6,9 @@ import java.util.HashMap;
 
 
 public class SampleSubObject1 extends SampleSuperObject {
+    public SampleSubObject1() throws IllegalArgumentException, IllegalAccessException {
+        super();
+    }
     private String[] subStringArray;
     private ArrayList<Integer> subArrayListInteger;
     private HashMap<String[], ArrayList<String>> subMap;

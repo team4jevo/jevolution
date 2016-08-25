@@ -4,11 +4,10 @@ import java.util.*;
 
 
 public class GameObjectDB {
-    private static final int MAX_HISTORY = 250;
     private List<GameObjectRecord> records;
 
     public GameObjectDB() {
-        this.records = new ArrayList<GameObjectRecord>();
+        this.records = new ArrayList<>();
     }
 
     /**
@@ -44,6 +43,10 @@ public class GameObjectDB {
                 records.add(record);
             }
         }
+    }
+    
+    public void clear() {
+        records = new ArrayList<>();
     }
 
     /**
