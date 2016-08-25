@@ -20,8 +20,18 @@ public class App extends Application {
     @Override
     public void start (Stage stage ) throws Exception {
         System.out.println("start");
-        System.out.println(getClass().getResource("ui.fxml"));
+      //  System.out.println(getClass().getResource("ui.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("ui.fxml"));
+
+     //   FXMLLoader fxmlLoader = new FXMLLoader();
+    //    Parent root = (Parent) fxmlLoader.load(getClass().getResource("ui.fxml"));
+     //   Controller controller = (Controller) fxmlLoader.getController();
+     //   System.out.print (" controller "+ controller);
+        //controller.setStage(stage);
+
+
+     //   Controller c = (Controller) fxmlLoader.g
+
         //root contains controller inside;
         System.out.println("root loaded");
         Scene scene = new Scene(root, 800, 800);
