@@ -1,155 +1,124 @@
 package metrics;
 
-<<<<<<< HEAD
-
-public class GameObjectRecord {
-    private static long n = 0;
-    private long id;
-    private graphics.GameObject gameObject;
-    private String type;
-    
-    public GameObjectRecord(graphics.GameObject gameObject) {
-        this.gameObject = gameObject;
-        this.id = ++GameObjectRecord.n;
-        this.type = gameObject.getClass().getSimpleName();
-    }
-    
-    public GameObjectRecord(graphics.GameObject gameObject, String type) {
-        this.gameObject = gameObject;
-        this.id = ++GameObjectRecord.n;
-        this.type = type;
-    }
-    
-    public long getId() {
-        return this.id;
-    }
-    
-    public graphics.GameObject getGameObject() {
-        return this.gameObject;
-    }
-    
-    public String getType() {
-        return this.type;
-    }
-    
-    @Override
-    public String toString() {
-        return this.id + " " + this.type;
-    }
-   
-=======
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import jevo.GameObject;
 
 /**
  * Experimenting. Ignore this class for now
+ * 
  * @author student
  *
  */
 public class GameObjectRecord {
-    private static long n = 0;
-    private long id;
+    private static final int MAX_HISTORY = 250;
+    private static final Class<?> limitingClass = jevo.GameObject.class;
+    private int nUpdate;
     private GameObject gameObject;
-    private Field[] fields;
-    private ArrayList<Field> fieldsList;
-    
-    public GameObjectRecord(GameObject gameObject) {
+    private List<HistoryRecord> recordedHistory;
+
+    public GameObjectRecord(GameObject gameObject)
+            throws IllegalArgumentException, IllegalAccessException {
         this.gameObject = gameObject;
-        this.id = ++GameObjectRecord.n;
-        this.fields = gameObject.getClass().getDeclaredFields();
-        this.fieldsList = new ArrayList<Field>();
+        this.nUpdate = 0;
+        updateHistory();
     }
-    
-    public ArrayList<Field> getFieldsList() {
-        return this.fieldsList;
+
+    public int getId() {
+        return this.gameObject.getId();
     }
-    
-    public long getId() {
-        return this.id;
-    }
-    
+
     public GameObject getGameObject() {
         return this.gameObject;
     }
-    
-    public void printFields() {
-        System.out.println(this.fields.length);
-        for (Field field : fields) {
-            System.out.println(field.getName() + " " + field.getType().getSimpleName());
-        }
-    }
-    
-    public static void main(String args[]) {
-        GameObject object1 = new customgl.LocalCreature("LC", 1, 2);
-        GameObject object2 = new customgl.CreatureSimple(2, 2);
-        GameObjectRecord gor = new GameObjectRecord(object1);
-        GameObjectRecord gor2 = new GameObjectRecord(object2);
-        
-        /*
-        gor.printFields();
-        gor2.printFields();
-        Field[] fields = object1.getClass().getSuperclass().getDeclaredFields();
-        for (Field field : fields) {
-            System.out.println(field.getName() + " " + field.getType().getSimpleName());
-        }
-        */
-        
-        Object obj = new Object();
-        /*
-        gor.printFieldsRecursively(object2);
-        ArrayList<Field> fields = gor.getFieldsList();
-        for (Field field : fields) {
-            System.out.println(field);
-        }
-        */
-        gor.printPrivateFields(object2.getClass());
-        //gor.printClasses(object2.getClass());
 
+    public String getType() {
+        return this.gameObject.getGoType();
     }
     
-    /*
-    public void printFieldsRecursively(GameObject gameObject) {
-        Field[] fields = gameObject.getClass().getDeclaredFields();
-        if (fields.length != 0) {
-            for (Field field : fields) {
-                System.out.println(field.getName() + " " + field.getType().getSimpleName());
-            }
-        }
+    public List<HistoryRecord> getRecordedHistory() {
+        return this.recordedHistory;
     }
-    */
-    
-    public void printPrivateFields(Class c) {
-        if (GameObject.class.isAssignableFrom(c)) {
+
+    public int getNUpdate() {
+        return nUpdate;
+    }
+
+    public void setNUpdate(int nUpdate) {
+        this.nUpdate = nUpdate;
+    }
+
+    public HashMap<String, Object> getParameters()
+            throws IllegalArgumentException, IllegalAccessException {
+        HashMap<String, Object> ans = new HashMap<>();
+        for (Class<?> c = this.gameObject.getClass(); limitingClass
+                .isAssignableFrom(c); c = c.getSuperclass()) {
             Field[] fields = c.getDeclaredFields();
-            if (fields.length != 0) {
-                for (Field field : fields) {
-                    System.out.println(field.getName() + " " + field.getType().getSimpleName());
+            for (Field field : fields) {
+                field.setAccessible(true);
+                String fieldName = field.getName();
+                String fieldTypeName = field.getType().getSimpleName()
+                        .toLowerCase();
+                switch (fieldTypeName) {
+                case "boolean":
+                    ans.put(fieldName, (Boolean) field.get(this.gameObject));
+                    break;
+                case "byte":
+                    ans.put(fieldName, (Byte) field.get(this.gameObject));
+                    break;
+                case "short":
+                    ans.put(fieldName, (Short) field.get(this.gameObject));
+                    break;
+                case "int":
+                    ans.put(fieldName, (Integer) field.get(this.gameObject));
+                    break;
+                case "long":
+                    ans.put(fieldName, (Long) field.get(this.gameObject));
+                    break;
+                case "float":
+                    ans.put(fieldName, (Float) field.get(this.gameObject));
+                    break;
+                case "double":
+                    ans.put(fieldName, (Double) field.get(this.gameObject));
+                    break;
+                case "char":
+                    ans.put(fieldName, (Character) field.get(this.gameObject));
+                    break;
+                case "string":
+                    ans.put(fieldName, (String) field.get(this.gameObject));
+                    break;
+                default:
+                    break;
                 }
             }
-            printPrivateFields(c.getSuperclass());
         }
+        return ans;
     }
-    
-    public void printClasses(Class c) {
-        while (c != null) {
-            System.out.println(c.getSimpleName());
-            c = c.getSuperclass();
-        }
-    }
-    
-    public void printFieldsRecursively(Object object) {
-        System.out.println(GameObject.class.isInstance(object));
-        System.out.println(object.getClass().getGenericSuperclass().getTypeName());
-        Field[] fields = object.getClass().getDeclaredFields();
-        if (fields.length != 0 && GameObject.class.isInstance(object)) {
-            for (Field field : fields) {
-                this.fieldsList.add(field);
+
+    public void updateHistory() throws IllegalArgumentException, IllegalAccessException {
+        if (this.recordedHistory == null) {
+            recordedHistory = new ArrayList<>();
+            recordedHistory.add(new HistoryRecord(nUpdate++, getParameters()));
+        } else {
+            if (recordedHistory.size() >= MAX_HISTORY) {
+                // Remove last element if size is max size
+                recordedHistory.remove(0);
             }
-            printFieldsRecursively(object.getClass().getGenericSuperclass());
+            recordedHistory.add(new HistoryRecord(nUpdate++, getParameters()));
         }
     }
-    
->>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
+
+    public static void main(String args[])
+            throws IllegalArgumentException, IllegalAccessException {
+        SampleSubObject1 sso = new SampleSubObject1();
+        GameObjectRecord gor = new GameObjectRecord(sso);
+        HashMap<String, Object> parameters = gor.getParameters();
+        for (String fieldName : parameters.keySet()) {
+            System.out.println(fieldName + " " + parameters.get(fieldName));
+        }
+    }
+
 }

@@ -1,12 +1,10 @@
 package metrics;
 
-import java.util.ArrayList;
-import java.util.List;
-<<<<<<< HEAD
-import gamelogic2.Organism;
+import java.util.*;
 
 
 public class GameObjectDB {
+    private static final int MAX_HISTORY = 250;
     private List<GameObjectRecord> records;
 
     public GameObjectDB() {
@@ -14,13 +12,16 @@ public class GameObjectDB {
     }
 
     /**
-     * Add's a single game object record to database. Record will not be added
+     * Adds a single game object record to database. Record will not be added
      * if it does not have unique id.
      * 
      * @param record
      *            game object record to be added.
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    public void addRecord(GameObjectRecord record) {
+    public void addRecord(GameObjectRecord record)
+            throws IllegalArgumentException, IllegalAccessException {
         // If record's id is unique, add it to list
         if (uniqueId(record)) {
             records.add(record);
@@ -28,13 +29,16 @@ public class GameObjectDB {
     }
 
     /**
-     * Add's a list of game object records to database. Those records that do
+     * Adds a list of game object records to database. Those records that do
      * not have unique id will not be added.
      * 
      * @param listOfRecords
      *            list containing game object records to be added.
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    public void addRecords(List<GameObjectRecord> listOfRecords) {
+    public void addRecords(List<GameObjectRecord> listOfRecords)
+            throws IllegalArgumentException, IllegalAccessException {
         for (GameObjectRecord record : listOfRecords) {
             if (uniqueId(record)) {
                 records.add(record);
@@ -43,7 +47,7 @@ public class GameObjectDB {
     }
 
     /**
-     * Remove's game object record from database.
+     * Removes game object record from database.
      * 
      * @param id
      *            id of game object record to be removed.
@@ -63,7 +67,37 @@ public class GameObjectDB {
     }
 
     /**
-     * Return's game object record. Return's null if no such record with passed
+     * Returns history of the indicated game objects record
+     * 
+     * @param recordId
+     *            id of game objects record for which to return the history
+     * @return list of history records
+     */
+    public List<HistoryRecord> getHistory(int recordId) {
+        List<HistoryRecord> ans = null;
+        for (GameObjectRecord record : records) {
+            if (record.getId() == recordId) {
+                ans = record.getRecordedHistory();
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * Returns map with history of all game object records
+     * 
+     * @return map of history records
+     */
+    public HashMap<Integer, List<HistoryRecord>> getHistories() {
+        HashMap<Integer, List<HistoryRecord>> ans = new HashMap<>();
+        for (GameObjectRecord record : records) {
+            ans.put(record.getId(), record.getRecordedHistory());
+        }
+        return ans;
+    }
+
+    /**
+     * Returns game object record. Returns null if no such record with passed
      * id exists.
      * 
      * @param id
@@ -94,38 +128,7 @@ public class GameObjectDB {
     }
 
     /**
-     * Return's number of game object records containing game objects with
-     * specified type and indicated inner state. Inner state exists for all
-     * subclasses of class Organism. If specified type has no inner state,
-     * returns 0.
-     * 
-     * @param type
-     *            game object type
-     * @param state
-     *            game object inner state
-     * @return
-     */
-    public int getTotalRecordsWithState(String type, boolean state) {
-        int n = 0;
-        for (GameObjectRecord record : records) {
-            if (record.getType().equals(type)) {
-                graphics.GameObject gameObject = record.getGameObject();
-                // If gameObject is not an Organism, break loop
-                if (!Organism.class.isInstance(gameObject)) {
-                    break;
-                }
-                // Cast gameObject to access getState method of Organism class
-                Organism organism = (Organism) gameObject;
-                if (organism.getState() == state) {
-                    n++;
-                }
-            }
-        }
-        return n;
-    }
-
-    /**
-     * Replace's game object record with id matching the passed id with passed
+     * Replaces game object record with id matching the passed id with passed
      * game object record. No record will be deleted if no such record exists
      * with id that equals passed id.
      * 
@@ -157,17 +160,29 @@ public class GameObjectDB {
         return true;
     }
 
-=======
+    public static void main(String[] args)
+            throws IllegalArgumentException, IllegalAccessException {
+        Random rand = new Random();
+        jevosim.CreatureDependant cd = new jevosim.CreatureDependant(1, 1);
+        GameObjectRecord gor = new GameObjectRecord(cd);
+        GameObjectDB godb = new GameObjectDB();
+        godb.addRecord(gor);
+        List<HistoryRecord> history = godb.getRecord(cd.getId()).getRecordedHistory();
+        for (HistoryRecord histRec : history) {
+            System.out.println(histRec.getNUpdate() + " " + histRec.getParameters());
+        }
+        for (int i = 0; i < 300; i++) {
+            cd.setLogicX(rand.nextInt(10));
+            cd.setState(rand.nextBoolean());
+            GameObjectRecord rec = godb.getRecord(cd.getId());
+            rec.updateHistory();
+            //godb.replaceRecord(id, newRecord);
+            
+        }
+        history = godb.getRecord(cd.getId()).getRecordedHistory();
+        for (HistoryRecord histRec : history) {
+            System.out.println(histRec.getNUpdate() + " " + histRec.getParameters());
+        }
+    }
 
-public class GameObjectDB {
-    private List<GameObjectRecord> records;
-    
-    public GameObjectDB() {
-        this.records = new ArrayList<>();
-    }
-    
-    public void addRecord(GameObjectRecord record) {
-        
-    }
->>>>>>> branch 'master' of https://github.com/team4jevo/jevolution.git
 }
