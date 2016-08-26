@@ -1,48 +1,48 @@
 package jevosim;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Hashtable;
-
 import javafx.scene.paint.Color;
-import metrics.GameObjectDB;
-import metrics.GameObjectRecord;
 
 /**
- * Created by LongJohn on 8/19/2016.
+ * Returns general GameObject object customized for simulation evolution. String
+ * parameter indicates type of this object used for later display. Integer
+ * parameters <x> and <y> indicate object's location in two dimensional space.
+ * Boolean parameter indicates whether object should be display in GUI or not.
+ * 
+ * @author aigars
+ *
  */
-
-// represents all entities of simulations.
-// all entities of specific simulation should extend it
-// to get displayed GameObject should contain pointer to a Token
-
 public class GameObject extends jevo.GameObject {
-    private static int counter = 0;
-    private int id;
     private static CellGrid cg;
 
     public GameObject() {
         super();
-        this.id = ++counter;
     }
 
     public GameObject(String type) {
         super(type);
-        this.id = ++counter;
     }
 
     public GameObject(String type, int x, int y, boolean isRendered) {
         super(type, x, y, isRendered);
-        this.id = ++counter;
     }
 
     public GameObject(String type, int x, int y) {
         super(type, x, y);
-        this.id = ++counter;
     }
 
-    public int getId() {
-        return this.id;
+    /**
+     * Assigns reference of CellGrid object to static field <cg>. It is used to
+     * replace GameObject object in GameObject[][] array with another GameObject
+     * object.
+     * 
+     * @param cg
+     *            CellGrid object containing two dimensional array of GameObject
+     *            objects
+     * 
+     */
+    public static void setCellGrid(CellGrid cg) {
+        GameObject.cg = cg;
     }
 
     @Override
@@ -54,26 +54,22 @@ public class GameObject extends jevo.GameObject {
         if (CellA.class.isAssignableFrom(this.getClass())) {
             type = "GreenCell";
             coop = String.valueOf(CellA.getCooperativeness());
-            aggr = String.valueOf(CellA.getAggressiveness()); 
+            aggr = String.valueOf(CellA.getAggressiveness());
         }
         if (CellB.class.isAssignableFrom(this.getClass())) {
             type = "OrangeCell";
             coop = String.valueOf(CellB.getCooperativeness());
-            aggr = String.valueOf(CellB.getAggressiveness()); 
+            aggr = String.valueOf(CellB.getAggressiveness());
         }
         if (CellC.class.isAssignableFrom(this.getClass())) {
             type = "RedCell";
             coop = String.valueOf(CellC.getCooperativeness());
-            aggr = String.valueOf(CellC.getAggressiveness()); 
+            aggr = String.valueOf(CellC.getAggressiveness());
         }
         ht.put("Type", type);
         ht.put("Cooperativeness", coop);
         ht.put("Aggresiveness", aggr);
         return ht;
-    }
-    
-    public static void setCellGrid(CellGrid cg) {
-        GameObject.cg = cg;
     }
 
     @Override

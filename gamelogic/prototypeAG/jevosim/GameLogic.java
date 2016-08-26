@@ -6,13 +6,20 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Random;
-
-import com.sun.xml.internal.ws.org.objectweb.asm.ClassAdapter;
 
 import javafx.scene.paint.Color;
 
+/**
+ * Creates custom <GameLogic> object that has multiple functions. It acts as a
+ * wrapper for <CellGrid> object, defines configuration of simulation, allows
+ * end user to change values for some initial parameters of simulation,
+ * initialize simulation and helps to connect core game logic to GUI.
+ * <GameLogic> extends <jevo.GameLogic> class.
+ * 
+ * @author aigars
+ *
+ */
 public class GameLogic extends jevo.GameLogic {
     int tmpX = 0;
     CellGrid grid;
@@ -27,6 +34,18 @@ public class GameLogic extends jevo.GameLogic {
         this.aliveCells = null;
     }
 
+    /**
+     * Initializes <CellGrid> object <grid> with x length and y length of 2D
+     * array corresponding to passed <xSize> and <ySize> values.
+     * 
+     * @param xSize
+     *            length of array representing horizontal x axis in 2D.
+     * @param ySize
+     *            length of array representing vertical y axis in 2D.
+     * @throws Exception
+     *             thrown if <xSize> and <ySize> values are invalid. Both must
+     *             be in range [5, 100];
+     */
     public void initializeGrid(int xSize, int ySize) throws Exception {
         this.grid = new CellGrid(xSize, ySize);
         GameObject.setCellGrid(this.grid);
@@ -55,6 +74,22 @@ public class GameLogic extends jevo.GameLogic {
         }
     }
 
+    /**
+     * Initializes <CellGrid> object <grid> with x length and y length of 2D
+     * array corresponding to passed <xSize> and <ySize> values and pre-defined
+     * mix of <Cell> object types or single <Cell> object type.
+     * 
+     * @param xSize
+     *            length of array representing horizontal x axis in 2D.
+     * @param ySize
+     *            length of array representing vertical y axis in 2D.
+     * @param creatureSetup
+     *            Integer in range [0, 6] that indicates what type or types of
+     *            <Cell> objects should be filled in <GameObject> 2D array.
+     * @throws Exception
+     *             thrown if <xSize> and <ySize> values are invalid. Both must
+     *             be in range [5, 100];
+     */
     public void initializeGrid(int xSize, int ySize, int creatureSetup)
             throws Exception {
         this.cellLayout = creatureSetup;
@@ -177,7 +212,7 @@ public class GameLogic extends jevo.GameLogic {
         ht.put("Red neighbor non-locality [0,8]",
                 +CellC.getNeighborNonLocality() + "");
         ht.put("Game type [0, 6]", String.valueOf(this.cellLayout));
-        
+
         if (aliveCells == null || aliveCells.size() == 0) {
             ht.put("Green alive", "0");
             ht.put("Orange alive", "0");
@@ -187,7 +222,7 @@ public class GameLogic extends jevo.GameLogic {
             ht.put("Orange alive", String.valueOf(aliveCells.get(CellB.class)));
             ht.put("Red alive", String.valueOf(aliveCells.get(CellC.class)));
         }
-        
+
         return ht;
     }
 
@@ -321,10 +356,14 @@ public class GameLogic extends jevo.GameLogic {
         return re;
     }
 
+    /**
+     * Executes next turn by changing <Cell> objects states according to core
+     * game logic and displays results in form of <Token> objects that act as
+     * graphical representation of <Cell> object in 2D space.
+     */
     public void nextTurn() throws Exception {
-        System.out.println("next turn in game logic ");
         this.grid.update();
-        //super.getGe().getController().displayGlStatsInTable(this);
+        // super.getGe().getController().displayGlStatsInTable(this);
         for (int y = 0; y < this.grid.getY(); y++) {
             for (int x = 0; x < this.grid.getX(); x++) {
                 GameObject currentGameObject = this.grid.getGameObject(x, y);
@@ -359,6 +398,14 @@ public class GameLogic extends jevo.GameLogic {
         }
     }
 
+    /**
+     * Consolidates current game settings and <Cell> object parameters in a form
+     * of <StringBuilder> object with certain structure and returns <String>
+     * representation of <StringBuilder> object.
+     * 
+     * @return <String> object representing current game settings and <Cell>
+     *         object parameters.
+     */
     private String getExternalSetup() {
         StringBuilder ans = new StringBuilder();
         // Add grid size
@@ -406,6 +453,15 @@ public class GameLogic extends jevo.GameLogic {
         return ans.toString();
     }
 
+    /**
+     * Reads game parameters and data about <Cell> objects and sets the game
+     * parameters, location and state of <Cell> objects according to read data.
+     * In result, 2D array containing <GameOBject> objects will be reinitialized
+     * as well as <GraphicEngine> responsible for displaying <Cell> objects in
+     * GUI. Be aware that this method is very unsafe due to the fact that data
+     * structure of the selected input file can be similar to required data
+     * structure but could contain false data and data types.
+     */
     private void setExternalSetup(String externalSetup)
             throws NumberFormatException, Exception {
         if (externalSetup.length() == 0) {
@@ -577,6 +633,11 @@ public class GameLogic extends jevo.GameLogic {
         }
     }
 
+    /**
+     * Starts new game or simulation by reinitializing <CellGrid> object and
+     * populating 2D <GameObject> array in accordance to the last indicated
+     * <cellLayout> value.
+     */
     public void newGame() throws Exception {
         // Game settings
         initializeGrid(super.width, super.height, this.cellLayout);
