@@ -93,7 +93,7 @@ public class GameLogic {
     }
 
 
-    public boolean modifyStat (String parameter, String newValue)  {
+    public boolean modifyStat (String parameter, String newValue) throws NumberFormatException, Exception {
         // true if new value accepted; false if not; // if not accepted, no changes made
 
 

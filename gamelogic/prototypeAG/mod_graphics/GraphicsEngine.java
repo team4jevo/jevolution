@@ -24,7 +24,7 @@ public class GraphicsEngine {
     private TableColumn colGoValue;
     private Controller controller;
 
-    GraphicsEngine (Controller controller) {
+    public GraphicsEngine (Controller controller) {
         this.controller = controller;
     }
 
