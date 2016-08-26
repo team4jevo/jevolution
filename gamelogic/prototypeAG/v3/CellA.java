@@ -6,55 +6,60 @@ import java.util.Random;
 /**
  * Class represents creature whose conditions of survival are the original
  * conditions of survival from Game of Life.
+ * 
  * @author aigars
  *
  */
-public class CreatureSimple extends LocalCreature implements SurvivalInstinct {
+public class CellA extends Cell implements SurvivalInstinct {
 
     private static int agressiveness;
     private static int cooperativeness;
     private static int neighborNonLocality;
     private static Random random = new Random();
-    
-    public CreatureSimple(int x, int y) throws IllegalArgumentException, IllegalAccessException {
+
+    public CellA(int x, int y)
+            throws IllegalArgumentException, IllegalAccessException {
         super("CS", x, y);
     }
-    
+
     public static int getAggressiveness() {
         return agressiveness;
     }
 
     public static void setAggressiveness(int value) throws Exception {
         if (value < 0 || value > 10) {
-            throw new Exception("Invalid value provided. Value of cooperativeness must be in range [0, 10].");
+            throw new Exception(
+                    "Invalid value provided. Value of cooperativeness must be in range [0, 10].");
         }
-        CreatureSimple.agressiveness = value;
+        CellA.agressiveness = value;
     }
-    
+
     public static void setCooperativeness(int value) throws Exception {
         if (value < 0 || value > 10) {
-            throw new Exception("Invalid value provided. Value of cooperativeness must be in range [0, 10].");
+            throw new Exception(
+                    "Invalid value provided. Value of cooperativeness must be in range [0, 10].");
         }
-        CreatureSimple.cooperativeness = value;
+        CellA.cooperativeness = value;
     }
 
     public static int getCooperativeness() {
-        return CreatureSimple.cooperativeness;
+        return CellA.cooperativeness;
     }
 
     public static void setNeighborNonLocality(int value) throws Exception {
         if (value < 0 || value > 8) {
-            throw new Exception("Invalid value provided. Value of locality must be in range [0, 8].");
+            throw new Exception(
+                    "Invalid value provided. Value of locality must be in range [0, 8].");
         }
-        CreatureSimple.neighborNonLocality = value;
+        CellA.neighborNonLocality = value;
     }
 
     public static int getNeighborNonLocality() {
-        return CreatureSimple.neighborNonLocality;
+        return CellA.neighborNonLocality;
     }
 
     @Override
-    public boolean survives(ArrayList<LocalCreature> liveNeighbors) {
+    public boolean survives(ArrayList<Cell> liveNeighbors) {
         boolean state = false;
         // Default Game of Life survival conditions
         if (this.getState()) {
@@ -70,32 +75,26 @@ public class CreatureSimple extends LocalCreature implements SurvivalInstinct {
         }
         int sameType = 0;
         // Determine number of creatures nearby of the same type
-        for (LocalCreature creature : liveNeighbors) {
-            if (CreatureSimple.class.isInstance(creature)) {
+        for (Cell creature : liveNeighbors) {
+            if (CellA.class.isInstance(creature)) {
                 sameType++;
             }
         }
-        // Calculate probability of survival depending on level of cooperativeness and number of
+        // Calculate probability of survival depending on level of
+        // cooperativeness and number of
         // alive neighbors around of the same type
-        // If no neighbors of same type are around or cooperativeness is 0, p = 0
+        // If no neighbors of same type are around or cooperativeness is 0, p =
+        // 0
         double p = 0.0;
-        if (sameType != 0 && CreatureSimple.cooperativeness != 0) {
-            double mu = CreatureSimple.K * sameType * Math.sqrt(CreatureSimple.cooperativeness);
-            p =  CreatureSimple.random.nextGaussian() * CreatureSimple.SIGMA + mu;
+        if (sameType != 0 && CellA.cooperativeness != 0) {
+            double mu = CellA.K * sameType * Math.sqrt(CellA.cooperativeness);
+            p = CellA.random.nextGaussian() * CellA.SIGMA + mu;
         }
-        if (CreatureSimple.random.nextDouble() < p) {
+        if (CellA.random.nextDouble() < p) {
             state = true;
         }
-        
-        return state;
-    }
-    
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
 
+        return state;
     }
 
 }
